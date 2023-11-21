@@ -1,4 +1,4 @@
-﻿namespace TaskApp;
+﻿namespace ServerApp.Entities;
 
 public class EntityRole
 {

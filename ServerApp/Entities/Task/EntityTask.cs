@@ -1,4 +1,4 @@
-﻿namespace TaskApp.Entities;
+﻿namespace ServerApp.Entities;
 
 public class EntityTask
 {
