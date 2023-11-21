@@ -2,3 +2,8 @@
 /obj
 node_modules/
 /app.db
+/app.db-wal
+/app.db-shm
+/serverapp.db
+/serverapp.db-wal
+/serverapp.db-shm

@@ -6,6 +6,8 @@ using TaskApp.Components;
 using Blazorise;
 using Blazorise.Tailwind;
 using Blazorise.Icons.FontAwesome;
+using TaskApp.Api.Interfaces;
+using TaskApp.Api;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -25,6 +27,8 @@ builder.Services.AddScoped<AuthenticationStateProvider, CookieAuthenticationStat
 // register the account management interface
 builder.Services.AddScoped(
     sp => (IAccountManagement)sp.GetRequiredService<AuthenticationStateProvider>());
+
+builder.Services.AddScoped<ITaskController, TaskController>();
 
 // set base address for default host
 builder.Services.AddScoped(sp =>

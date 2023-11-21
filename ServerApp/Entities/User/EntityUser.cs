@@ -7,7 +7,7 @@ public class EntityUser
     private List<object> Aufgaben { get ;set; }
     private List<object> Rollen { get; set; }
 
-    public User(string vorname, string nachname, object? aufgabe, object? rolle){
+    public EntityUser(string vorname, string nachname, object? aufgabe, object? rolle){
         Vorname = vorname;
         Nachname = nachname;
         Aufgaben = new List<object>();

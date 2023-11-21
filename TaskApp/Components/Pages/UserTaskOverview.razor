@@ -1,0 +1,13 @@
+﻿@page "/task/user/overview"
+@using TaskApp.Api.Interfaces
+@inject ITaskController _taskController
+
+<h3>UserTaskOverview</h3>
+<button type="button" @onclick="GetUserTaskAsync">Hello World</button>
+
+@code {
+    public async Task GetUserTaskAsync() {
+        var a = await _taskController.GetTasksByUserAsync();
+        Console.WriteLine(a);
+    }
+}
