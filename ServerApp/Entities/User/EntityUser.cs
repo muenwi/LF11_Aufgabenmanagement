@@ -1,26 +1,19 @@
-﻿namespace TaskApp.Entities;
+﻿namespace ServerApp.Entities;
 
 public class EntityUser
 {
-    private string Vorname { get; set; }
-    private string Nachname { get; set; }
-    private List<object> Aufgaben { get ;set; }
-    private List<object> Rollen { get; set; }
+    public string Vorname { get; set; }
+    public string Nachname { get; set; }
+    public List<EntityTask> Tasks { get; set; }
+    public List<EntityRole> Rollen { get; set; }
 
-    public EntityUser(string vorname, string nachname, object? aufgabe, object? rolle){
+    public EntityUser(string vorname, string nachname, List<EntityTask>? tasks, EntityRole? rolle)
+    {
         Vorname = vorname;
         Nachname = nachname;
-        Aufgaben = new List<object>();
-        Rollen = new List<object>();
-        if(aufgabe != null) Aufgaben.Add(aufgabe);
-        if(rolle != null) Rollen.Add(rolle);
-    }
-
-    public List<object> AlleRollen (){
-        return Rollen;
-    }
-        
-    public List<object> AlleAufgaben (){
-        return Aufgaben;
+        Tasks = new List<EntityTask>();
+        Rollen = new List<EntityRole>();
+        if (tasks?.Count > 0) Tasks.AddRange(tasks);
+        if (rolle != null) Rollen.Add(rolle);
     }
 }
