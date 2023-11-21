@@ -7,9 +7,9 @@ public class UserService
         var newUser = new User("Test", "Tester", null, null);
         var exampleTasks = new List<TaskItem>
         {
-            new TaskItem(1, "Test 1", Aufgabenstatus.Neu, newUser),
-            new TaskItem(2, "Test 2", Aufgabenstatus.in_Bearbeitung, newUser),
-            new TaskItem(3, "Test 3", Aufgabenstatus.Fertig, newUser),
+            new TaskItem(1, "Test 1", "Neu", newUser),
+            new TaskItem(2, "Test 2", "in Bearbeitung", newUser),
+            new TaskItem(3, "Test 3", "Fertig", newUser),
         };
         return newUser;
     }
