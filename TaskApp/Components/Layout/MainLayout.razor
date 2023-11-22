@@ -7,22 +7,11 @@
         <NavMenu />
     </div>
 
-    <main>     
-        <div class="top-row px-2" style="text-align: right;">
-            <AuthorizeView>
-                <Authorized>
-                    Logged in as @context.User.Identity?.Name. <a href="logout">
-                        <span class="bi bi-door-closed-fill"
-                              aria-hidden="true" style="vertical-align:middle"></span> Logout
-                    </a>
-                </Authorized>
-            </AuthorizeView>
+    <main>
+        <div class="p-4 sm:ml-64">
+            <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
+                @Body
+            </div>
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-
-        
     </main>
 </div>

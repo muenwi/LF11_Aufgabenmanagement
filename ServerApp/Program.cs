@@ -84,7 +84,6 @@ app.MapGet("/tasks", async ([FromServices]ITaskManager manager, HttpContext cont
     var tasks = await manager.GetTasksAsync();
 
     if (tasks is null) throw new ArgumentNullException();
-    // if (task is null) return TypedResults.NotFound();
 
     return TypedResults.Json(tasks);
 });
@@ -104,9 +103,6 @@ app.MapDelete("/task", async ([FromServices]ITaskManager manager, HttpContext co
     return TypedResults.Ok();
 });
 
-// app.MapPost("/role", async (ClaimsPrincipal user, IRoleManager manager) => {
-//     user.AddIdentity(Role)
-// });
 
 // activate the CORS policy
 app.UseCors("wasm");
