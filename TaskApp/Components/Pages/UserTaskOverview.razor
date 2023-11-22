@@ -73,7 +73,7 @@ else
         var authState = await AuthState;
         claims = authState.User.Claims;
 
-        Tasks = await _taskController.GetTasksByUserAsync();
+        //Tasks = await _taskController.GetTasksByUserAsync();
         StateHasChanged();
     }
 
