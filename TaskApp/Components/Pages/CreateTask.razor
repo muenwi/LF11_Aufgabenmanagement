@@ -1,0 +1,42 @@
+﻿@page "/CreateTask"
+@using static Todo_App.Data.RoleEnum
+@using Todo_App.Data
+
+<header style="font-size:40px">Aufgabe erstellen</header>
+
+<div style="margin-bottom:20px">
+    <select @bind="@stat" @oninput="@((e) => { stat=(string)e.Value;})" style="color:white; background-color:blue; height:40px; width:90px; font-size:20px; text-align:center">
+        <option style="color:black; background-color:lightgrey" disabled selected hidden>Status</option>
+        <option style="color:black; background-color:lightgrey">@Status.ToDo</option>
+        <option style="color:black; background-color:lightgrey">@Status.Start</option>
+        <option style="color:black; background-color:lightgrey">@Status.Stop</option>
+        <option style="color:black; background-color:lightgrey">@Status.Done</option>
+    </select>
+    <select @bind="@Role" @oninput="@((e) => { Role=(string)e.Value;})" style="color:white; background-color:blue; height:40px; width:90px; font-size:20px; text-align:center">
+        <option style="color:black; background-color:lightgrey" disabled selected hidden>Rolle</option>
+        <option style="color:black; background-color:lightgrey">@RoleName.Azubi</option>
+        <option style="color:black; background-color:lightgrey">@RoleName.JuniorDev</option>
+        <option style="color:black; background-color:lightgrey">@RoleName.SeniorDev</option>
+        <option style="color:black; background-color:lightgrey">@RoleName.CEO</option>
+    </select>
+</div>
+
+<div style="width:1000px; height:700px;">
+    <input @bind="@Title" @oninput="@((e) => { Title=(string)e.Value;})" type="text" placeholder="Text..." style="scroll-behavior:unset; font-size:30px; width:inherit; height:10%" />
+    <textarea @bind="@Description" @oninput="@((e) => { Description=(string)e.Value;})" placeholder="Beschreibung..." style="font-size:larger; font-size:30px; resize:none; width:inherit; height:85%; margin-top:10px"></textarea>
+    <button @onclick="CreateTodo" name="btnErstellen" style="width:90px; height:5%; background-color:blue; color:white; font-size:20px; text-align:center">Erstellen</button>
+</div>
+
+@code {
+    private string Title { get; set; } = "";
+    private string Description { get; set; } = "";
+    private string Role { get; set; } = "Rolle";
+    private string stat { get; set; } = "Status";
+
+
+    private void CreateTodo()
+    {
+        Todo lTodo = new Todo(Role, Title, Description, stat);
+    }
+
+}
