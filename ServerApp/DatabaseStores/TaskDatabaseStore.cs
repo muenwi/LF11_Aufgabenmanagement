@@ -10,7 +10,6 @@ public class TaskDatabaseStore : ITaskDatabaseStore
     private readonly ServerAppDbContext _context;
 
     private DbSet<EntityTask> tasks => _context.Tasks;
-    private DbSet<EntityTask2Role> tasks2Role => _context.Tasks2Roles;
 
     public TaskDatabaseStore(ServerAppDbContext context) 
     {
@@ -22,24 +21,47 @@ public class TaskDatabaseStore : ITaskDatabaseStore
         cancellationToken.ThrowIfCancellationRequested();
 
         await tasks.AddAsync(entity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task UpdateAsync(EntityTask entity, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(EntityTask entity, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        throw new NotImplementedException();
+
+        tasks.Update(entity);
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task DeleteAsync(EntityTask entity, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(EntityTask entity, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        throw new NotImplementedException();
+        
+        tasks.Remove(entity);
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task<EntityTask> GetTaskAsync(int id)
+    public async Task<EntityTask> GetTaskAsync(int id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var task = await tasks.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (task is null) throw new ArgumentException("Task was null");
+
+        return task;   
+    }
+
+    public async Task<IList<EntityTask>> GetTasksByIdsAsync(IList<int> ids, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var taskList = await tasks.Where(x => ids.Contains(x.Id)).ToListAsync();
+
+        if (tasks is null) throw new ArgumentException("Task was null");
+
+        return taskList;   
     }
 
     public async Task<IList<EntityTask>> GetTasksAsync(CancellationToken cancellationToken = default)
