@@ -20,7 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(x => x.UseSqlite("DataSource=app.db"
 builder.Services.AddDbContext<ServerAppDbContext>(x => x.UseSqlite("DataSource=serverapp.db"));
 
 
-builder.Services.AddIdentityCore<AppUser>()
+builder.Services.AddIdentityCore<EntityAppUser>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddApiEndpoints();
 
@@ -42,10 +42,10 @@ builder.Services.AddScoped<ITaskManager, TaskManager>();
 var app = builder.Build();
 
 // create routes for the identity endpoints
-app.MapIdentityApi<AppUser>();
+app.MapIdentityApi<EntityAppUser>();
 
 // provide an end point to clear the cookie for logout
-app.MapPost("/Logout", async (ClaimsPrincipal user, SignInManager<AppUser> signInManager) =>
+app.MapPost("/Logout", async (ClaimsPrincipal user, SignInManager<EntityAppUser> signInManager) =>
 {
     await signInManager.SignOutAsync();
     return TypedResults.Ok();
