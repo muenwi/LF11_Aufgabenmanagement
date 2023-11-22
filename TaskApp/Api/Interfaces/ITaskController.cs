@@ -4,7 +4,7 @@ namespace TaskApp.Api.Interfaces;
 
 public interface ITaskController
 {
-    public Task<IList<TaskModel>> GetTasksByUserAsync();
+    public Task<List<TaskModel>> GetTasksByUserAsync();
 
     public Task CreateTask(TaskModel newTask);
 }
