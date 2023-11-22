@@ -4,7 +4,7 @@
 
 <PageTitle>Register</PageTitle>
 
-<h1>Register</h1>
+<p class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">Registrieren Sie sich!</p>
 
 <AuthorizeView>
     <Authorized>
@@ -24,29 +24,23 @@
                     <div class="alert alert-danger">@error</div>
                 }
             }
-            <div class="flex-outer">
-                <div>
-                    <label for="email">
-                        Email:
-                    </label>
-                    <input autofocus autocomplete="on" required id="email" name="emailInput" placeholder="Enter your email address" type="email" @bind-value="email" />
+
+            <form>
+                <div class="grid gap-6 mb-6 md:grid-cols-1" style="text-align: left;width: 250px;">
+                    <label for="email" class="block mb-0 text-sm font-medium text-gray-900 dark:text-black">E-Mail</label>
+                    <input @bind-value="email" type="email" id="email" style="text-align: left;" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="john.doe@company.com" required>
+
+                    <label for="password" class="block mb-0 text-sm font-medium text-gray-900 dark:text-black">Passwort</label>
+                    <input @bind-value="password" type="password" id="password" style="text-align: left;" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="•••••••••" required>
+
+                    <label for="confirmPassword" class="block mb-0 text-sm font-medium text-gray-900 dark:text-black">Passwort betsätigen</label>
+                    <input @bind-value="password" type="password" id="passwordInput" style="text-align: left;" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="•••••••••" required>
+
                 </div>
-                <div>
-                    <label for="password">
-                        Password:
-                    </label>
-                    <input required id="password" name="passwordInput" placeholder="Enter your password" type="password" @bind-value="password" /><br />
-                </div>
-                <div>
-                    <label for="confirmPassword">
-                        Retype password:
-                    </label>
-                    <input required id="confirmPassword" name="confirmPasswordInput" placeholder="Re-enter your password" type="password" @bind-value="confirmPassword" />
-                </div>
-                <div>
-                    <button class="btn btn-primary" @onclick="DoRegisterAsync">Register</button>
-                </div>
-            </div>
+
+                <button type="button" @onclick="DoRegisterAsync" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Registrieren</button>
+            </form>
+
         }
     </NotAuthorized>
 </AuthorizeView>
