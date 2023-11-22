@@ -41,7 +41,7 @@ else
 }
 
 @code {
-    List<TaskModel> Tasks;
+    List<TaskModel> Tasks = new List<TaskModel>();
     UserBasic loggedInUser;
 
     [CascadingParameter]
@@ -49,9 +49,7 @@ else
     private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
 
     protected override async Task OnInitializedAsync()
-    {
-        Tasks = new List<TaskModel>();
-      
+    { 
         if (AuthState == null)
         {
             return;

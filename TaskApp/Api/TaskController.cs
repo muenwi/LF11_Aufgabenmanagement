@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 using TaskApp.Api.Interfaces;
 using TaskApp.Api.Models;
 
@@ -23,19 +24,19 @@ public class TaskController : ITaskController
         => _httpClient = httpClientFactory.CreateClient("Auth");
 
     [Authorize]
-    public void CreateTask(TaskModel newTask)
+    public async Task CreateTask(TaskModel newTask)
     {
         try
         {
-
+            return;
         }catch (Exception ex)
         {
-
+            return;
         }
     }
 
     [Authorize]
-    public async Task<string> GetTasksByUserAsync()
+    public async Task<IList<TaskModel>> GetTasksByUserAsync()
     {
         string[] defaultDetail = ["An unknown error prevented registration from succeeding."];
 
@@ -48,43 +49,20 @@ public class TaskController : ITaskController
             // successful?
             if (!result.IsSuccessStatusCode)
             {
-                return "Das ist ja mal nicht so gut gelaufen :,(";
+                return new List<TaskModel>();
             }
 
             // body should contain details about why it failed
             var details = await result.Content.ReadAsStringAsync();
-            return details;
-            //var problemDetails = JsonDocument.Parse(details);
-            //var errors = new List<string>();
-            //var errorList = problemDetails.RootElement.GetProperty("errors");
+            var a = JsonConvert.DeserializeObject<IList<TaskModel>>(details);
 
-            // foreach (var errorEntry in errorList.EnumerateObject())
-            // {
-            //     if (errorEntry.Value.ValueKind == JsonValueKind.String)
-            //     {
-            //         errors.Add(errorEntry.Value.GetString()!);
-            //     }
-            //     else if (errorEntry.Value.ValueKind == JsonValueKind.Array)
-            //     {
-            //         errors.AddRange(
-            //             errorEntry.Value.EnumerateArray().Select(
-            //                 e => e.GetString() ?? string.Empty)
-            //             .Where(e => !string.IsNullOrEmpty(e)));
-            //     }
-            // }
-
-            // return the error list
-            // return new FormResult
-            // {
-            //     Succeeded = false,
-            //     ErrorList = problemDetails == null ? defaultDetail : [.. errors]
-            // };
+            return a ?? new List<TaskModel>();
         }
         catch
         {
             Console.WriteLine("The http request failed...");
         }
 
-        return "Das ist ja mal nicht so gut gelaufen Rüdigar!";
+        return new List<TaskModel>();
     }
 }

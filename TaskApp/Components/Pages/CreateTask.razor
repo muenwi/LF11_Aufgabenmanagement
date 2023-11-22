@@ -26,7 +26,7 @@
 <div style="width:1000px; height:700px;">
     <input @bind="@Title" @oninput="@((e) => { Title=(string)e.Value;})" type="text" placeholder="Text..." style="scroll-behavior:unset; font-size:30px; width:inherit; height:10%" />
     <textarea @bind="@Description" @oninput="@((e) => { Description=(string)e.Value;})" placeholder="Beschreibung..." style="font-size:larger; font-size:30px; resize:none; width:inherit; height:85%; margin-top:10px"></textarea>
-    <button @onclick="CreateTodo" name="btnErstellen" style="width:90px; height:5%; background-color:blue; color:white; font-size:20px; text-align:center">Erstellen</button>
+    @* <button @onclick="CreateTodo" name="btnErstellen" style="width:90px; height:5%; background-color:blue; color:white; font-size:20px; text-align:center">Erstellen</button> *@
 </div>
 
 @code {
@@ -37,7 +37,7 @@
 
 
 
-    private void CreateTodo()
+    @* private void CreateTodo()
     {
         var newTask = new TaskModel();
         newTask.Status = stat;
@@ -48,6 +48,6 @@
 
         _taskController.CreateTask(newTask);
 
-    }
+    } *@
 
 }
