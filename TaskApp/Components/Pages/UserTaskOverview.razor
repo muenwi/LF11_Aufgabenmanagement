@@ -26,12 +26,11 @@ else
         <table class="table">
             <thead>
                 <tr>
-                    //todo: Anpassen!
-                    <th>Priorität</th>
-                    <th>Nummer</th>
+                @*<th>Priorität</th>*@
+                @*<th>Nummer</th>*@
                     <th>Bezeichung</th>
                     <th>Status</th>
-                    <th>Erstelldatum</th>
+                @*<th>Erstelldatum</th>*@
                 </tr>
             </thead>
             
@@ -39,12 +38,11 @@ else
                 @foreach (var task in Tasks)
                 {
                     <tr>
-                        //todo: Anpassen!
-                        <td>@task.Priorität</td>
-                        <td>@task.Nummer</td>
+                    @*<td>@task.Priorität</td>*@
+                    @*<td>@task.Nummer</td>*@
                         <td>@task.Title</td>
                         <td>@task.Status</td>
-                        <td>@task.CreateDate.ToShortDateString()</td>
+                    @*<td>@task.CreateDate.ToShortDateString()</td>*@
                     </tr>
                 }
             </tbody>
