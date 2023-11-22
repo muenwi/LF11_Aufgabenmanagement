@@ -8,7 +8,7 @@ Anweisungen zum starten der Anwendung:
 
     Directory: <PATH_TO_REPO>/ServerApp
 
-    1. dotnet ef migrations add InitialCreate
+    1. dotnet ef migrations add InitialCreate --cotext ServerApp
     2. dotnet ef database update
 
 2. Wie lädt man Tailwind?

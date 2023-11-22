@@ -1,4 +1,4 @@
-﻿@page "/userTasks"
+﻿@* @page "/userTasks"
 @using ServerApp.Entities.User
 @using ServerApp.Entities.Task
 @using ServerApp.Services
@@ -15,6 +15,7 @@
 }
 else
 {
+
     <div style="display: flex; justify-content: flex-end;">
         <p>@loggedInUser.Vorname @loggedInUser.Nachname</p>
     </div>
@@ -45,6 +46,7 @@ else
             }
         </tbody>
     </table>
+    
 
 }
 
@@ -63,4 +65,4 @@ else
         Tasks = loggedInUser.Tasks;
         StateHasChanged();
     }
-}
+} *@

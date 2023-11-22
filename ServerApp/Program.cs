@@ -36,6 +36,7 @@ builder.Services.AddCors(
             .AllowCredentials()));
 
 builder.Services.AddScoped<ITaskDatabaseStore, TaskDatabaseStore>();
+builder.Services.AddScoped<ITask2RoleDatabaseStore, Task2RoleDatabaseStore>();
 builder.Services.AddScoped<ITaskManager, TaskManager>();
 
 var app = builder.Build();
@@ -56,7 +57,7 @@ app.MapPost("/task", async ([FromServices]ITaskManager manager, HttpContext cont
         Title = "First Task",
         UserId = new Guid("5b39f0ac-0055-4892-a776-bd711d12e70d"),
         StartDate = DateTime.Now,
-        Status = 1,
+        Status = "Bcaklock",
     });
 
     if (task is null) throw new ArgumentNullException();
@@ -74,7 +75,6 @@ app.MapGet("/task/user", async ([FromServices]ITaskManager manager, HttpContext 
     var tasks = await manager.GetTaskByUserAsync(new Guid(userId));
 
     if (tasks is null) throw new ArgumentNullException();
-    // if (task is null) return TypedResults.NotFound();
 
     return TypedResults.Json(tasks);
 });
@@ -95,7 +95,7 @@ app.MapDelete("/task", async ([FromServices]ITaskManager manager, HttpContext co
         Title = "First Task",
         UserId = new Guid("5b39f0ac-0055-4892-a776-bd711d12e70d"),
         StartDate = DateTime.Now,
-        Status = 1,
+        Status = "Backlock",
     });
 
     if (task is null) throw new ArgumentNullException();
@@ -118,10 +118,4 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.Run();
-
-class AppUser : IdentityUser {}
-
-class AppDbContext : IdentityDbContext<AppUser> {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options){}
-}
 
