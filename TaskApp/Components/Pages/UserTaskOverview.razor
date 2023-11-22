@@ -1,13 +1,78 @@
 ﻿@page "/task/user/overview"
 @using TaskApp.Api.Interfaces
 @inject ITaskController _taskController
+@attribute [Authorize]
+@using System.Security.Claims
+@using TaskApp.Api.Models
+@using TaskApp.Identity.Models
 
-<h3>UserTaskOverview</h3>
-<button type="button" @onclick="GetUserTaskAsync">Hello World</button>
+
+@attribute [StreamRendering]
+
+<PageTitle>persönlichen Aufgaben</PageTitle>
+
+<h1>Deine persönlichen Aufgaben</h1>
+
+@if (Tasks == null || loggedInUser == null || claims.Count() <= 0)
+{
+    <p><em>Deine Aufgaben werden geladen...</em></p>
+}
+else
+{
+        <div style="display: flex; justify-content: flex-end;">
+            <p>Hier siehst du eine persönlichen Aufgaben!</p>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                @*<th>Priorität</th>*@
+                @*<th>Nummer</th>*@
+                    <th>Bezeichung</th>
+                    <th>Status</th>
+                @*<th>Erstelldatum</th>*@
+                </tr>
+            </thead>
+            
+            <tbody>
+                @foreach (var task in Tasks)
+                {
+                    <tr>
+                    @*<td>@task.Priorität</td>*@
+                    @*<td>@task.Nummer</td>*@
+                        <td>@task.Title</td>
+                        <td>@task.Status</td>
+                    @*<td>@task.CreateDate.ToShortDateString()</td>*@
+                    </tr>
+                }
+            </tbody>
+        </table>
+   
+}
 
 @code {
-    public async Task GetUserTaskAsync() {
-        var a = await _taskController.GetTasksByUserAsync();
-        Console.WriteLine(a);
+    List<TaskModel> Tasks;
+    UserBasic loggedInUser;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tasks = new List<TaskModel>();
+        if (AuthState == null)
+        {
+            return;
+        }
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        var authState = await AuthState;
+        claims = authState.User.Claims;
+
+        //Tasks = await _taskController.GetTasksByUserAsync();
+        StateHasChanged();
     }
+
 }
