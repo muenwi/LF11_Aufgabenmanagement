@@ -1,6 +1,8 @@
 ﻿@page "/CreateTask"
-@using static Todo_App.Data.RoleEnum
-@using Todo_App.Data
+@using static TaskApp.Api.Models.RoleModel
+@using TaskApp.Api.Models
+@using TaskApp.Api.Interfaces
+@inject ITaskController _taskController
 
 <header style="font-size:40px">Aufgabe erstellen</header>
 
@@ -34,9 +36,18 @@
     private string stat { get; set; } = "Status";
 
 
+
     private void CreateTodo()
     {
-        Todo lTodo = new Todo(Role, Title, Description, stat);
+        var newTask = new TaskModel();
+        newTask.Status = stat;
+        newTask.Title = Title;
+        newTask.User = "test";
+        newTask.Created = DateTime.Now;
+        newTask.Description = Description;
+
+        _taskController.CreateTask(newTask);
+
     }
 
 }

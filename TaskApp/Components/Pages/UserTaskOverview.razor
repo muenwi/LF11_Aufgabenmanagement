@@ -51,6 +51,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         Tasks = new List<TaskModel>();
+      
         if (AuthState == null)
         {
             return;
@@ -61,7 +62,7 @@ else
         var authState = await AuthState;
         claims = authState.User.Claims;
 
-        //Tasks = await _taskController.GetTasksByUserAsync();
+        Tasks = await _taskController.GetTasksByUserAsync();
         StateHasChanged();
     }
 

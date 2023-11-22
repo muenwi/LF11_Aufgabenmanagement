@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using TaskApp.Api.Interfaces;
+using TaskApp.Api.Models;
 
 namespace TaskApp.Api;
 
@@ -20,6 +21,18 @@ public class TaskController : ITaskController
 
     public TaskController(IHttpClientFactory httpClientFactory)
         => _httpClient = httpClientFactory.CreateClient("Auth");
+
+    [Authorize]
+    public void CreateTask(TaskModel newTask)
+    {
+        try
+        {
+
+        }catch (Exception ex)
+        {
+
+        }
+    }
 
     [Authorize]
     public async Task<string> GetTasksByUserAsync()
