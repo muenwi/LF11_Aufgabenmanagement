@@ -8,16 +8,20 @@ Anweisungen zum starten der Anwendung:
 
     Directory: <PATH_TO_REPO>/ServerApp
 
-    1. dotnet ef migrations add InitialCreate --cotext ServerApp
-    2. dotnet ef database update
+    1. dotnet ef migrations add InitialCreateServer --context ServerAppDbContext
+    2. dotnet ef database update InitialCreateServer --context ServerAppDbContext
+  
+    Directory <PATH_TO_REPO>/TaskApp
+   1. dotnet ef migrations add InitialCreateTask --context TaskAppDbContext
+    2. dotnet ef database update InitialCreateTask --context TaskAppDbContext
 
-2. Wie lädt man Tailwind?
+3. Wie lädt man Tailwind?
 
     1. In der TaskApp "npm i" (shorthand for install) ausführen
     2. Danach könnt ihr einfach folgendes ausführen: "npx Tailwindcss -i wwwroot/css/app.css -o wwwroot/css/app.min.css --watch"
         -> Das lädt die Styles in die Anwendung die ihr braucht und schaut gleichzeitig bei Änderungen danach, ob neue Styles hinzugefügt werden müssen
 
-3. Die ServerApp und die TaskApp starten
+4. Die ServerApp und die TaskApp starten
     Hier müsste für die VS-User einfach nur das Ausführen des .csproj files sein.
 
     Wenn man es über VS-Code ausführen will, hat man zwei Optionen:
