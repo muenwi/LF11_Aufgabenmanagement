@@ -1,19 +1,67 @@
 ﻿@page "/task/user/overview"
 @using TaskApp.Api.Interfaces
-@inject ITaskController _taskController
-@attribute [Authorize]
 @using System.Security.Claims
 @using TaskApp.Api.Models
 @using TaskApp.Identity.Models
-
-
+@attribute [Authorize]
 @attribute [StreamRendering]
+@inject ITaskController _taskController
 
 <PageTitle>persönlichen Aufgaben</PageTitle>
 
 <h1>Deine persönlichen Aufgaben</h1>
 
-@if (Tasks == null || loggedInUser == null || claims.Count() <= 0)
+<DataGrid TItem="TaskModel"
+          Data="@tasks"
+          ReadData="@OnReadData"
+          TotalItems="@totalTasks"
+          PageSize="1"
+          ShowPager
+          Responsive>
+    <DataGridCommandColumn />
+    <DataGridColumn Field="@nameof(TaskModel.Title)" Caption="Title" Editable />
+    <DataGridColumn Field="@nameof(TaskModel.Description)" Caption="Description" Editable />
+    <DataGridColumn Field="@nameof(TaskModel.Role)" Caption="Role" Editable />
+    <DataGridColumn Field="@nameof(TaskModel.Status)" Caption="Status"  Editable/>
+    <DataGridColumn Field="@nameof(TaskModel.Created)" Caption="Created" Editable/>
+</DataGrid>
+
+@code {
+    private List<TaskModel> tasks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tasks = await _taskController.GetTasksByUserAsync();;
+        await base.OnInitializedAsync();
+    }
+
+    private int totalTasks;
+
+    private async Task OnReadData( DataGridReadDataEventArgs<TaskModel> e )
+    {
+        if ( !e.CancellationToken.IsCancellationRequested )
+        {
+            List<TaskModel> response = null;
+
+            // this can be call to anything, in this case we're calling a fictional api
+            if ( e.ReadDataMode is DataGridReadDataMode.Virtualize )
+                response = (await _taskController.GetTasksByUserAsync()).Skip( e.VirtualizeOffset ).Take( e.VirtualizeCount ).ToList();
+            else if ( e.ReadDataMode is DataGridReadDataMode.Paging )
+                response = (await _taskController.GetTasksByUserAsync()).Skip( ( e.Page - 1 ) * e.PageSize ).Take( e.PageSize ).ToList();
+            else
+                throw new Exception( "Unhandled ReadDataMode" );
+
+            if ( !e.CancellationToken.IsCancellationRequested )
+            {
+                totalTasks = (await _taskController.GetTasksByUserAsync()).Count;
+                tasks = new List<TaskModel>( response ); // an actual data for the current page
+            }
+        }
+    }
+
+
+}
+@* @if (Tasks == null || loggedInUser == null || claims.Count() <= 0)
 {
     <p><em>Deine Aufgaben werden geladen...</em></p>
 }
@@ -37,10 +85,10 @@ else
                 }
             </tbody>
         </table>
-    </div>   
+    </div>    *@
 }
 
-@code {
+@* @code {
     List<TaskModel> Tasks = new List<TaskModel>();
     UserBasic loggedInUser;
 
@@ -64,4 +112,4 @@ else
         StateHasChanged();
     }
 
-}
+} *@

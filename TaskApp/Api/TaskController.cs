@@ -36,7 +36,7 @@ public class TaskController : ITaskController
     }
 
     [Authorize]
-    public async Task<IList<TaskModel>> GetTasksByUserAsync()
+    public async Task<List<TaskModel>> GetTasksByUserAsync()
     {
         string[] defaultDetail = ["An unknown error prevented registration from succeeding."];
 
@@ -54,7 +54,9 @@ public class TaskController : ITaskController
 
             // body should contain details about why it failed
             var details = await result.Content.ReadAsStringAsync();
-            var a = JsonConvert.DeserializeObject<IList<TaskModel>>(details);
+
+            Console.WriteLine(details);
+            var a = JsonConvert.DeserializeObject<IEnumerable<TaskModel>>(details)?.ToList();
 
             return a ?? new List<TaskModel>();
         }

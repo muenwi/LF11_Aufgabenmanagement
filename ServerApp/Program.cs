@@ -55,9 +55,10 @@ app.MapPost("/task", async ([FromServices]ITaskManager manager, HttpContext cont
 {
     var task = await manager.CreateTaskAsync(new EntityTask{
         Title = "First Task",
-        UserId = new Guid("5b39f0ac-0055-4892-a776-bd711d12e70d"),
+        UserId = new Guid("ca3c3ab7-d540-45e1-946b-3f0fb0dea948"),
         StartDate = DateTime.Now,
-        Status = "Bcaklock",
+        Status = "Backlock",
+        Description = "This is the first task."
     });
 
     if (task is null) throw new ArgumentNullException();
