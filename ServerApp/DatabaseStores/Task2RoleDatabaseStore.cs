@@ -5,12 +5,12 @@ using ServerApp.Entities;
 
 namespace ServerApp.DatabaseStores;
 
-public class Task2RoleDatabase : ITask2RoleDatabaseStore
+public class Task2RoleDatabaseStore : ITask2RoleDatabaseStore
 {
     private readonly ServerAppDbContext _context;
     private DbSet<EntityTask2Role> _tasks2Roles => _context.Tasks2Roles;
 
-    public Task2RoleDatabase(ServerAppDbContext context) {
+    public Task2RoleDatabaseStore(ServerAppDbContext context) {
         _context = context;
     }
     public async Task CreateAsync(EntityTask2Role entity, CancellationToken cancellationToken = default)
@@ -37,7 +37,7 @@ public class Task2RoleDatabase : ITask2RoleDatabaseStore
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IList<int>> GetTasksByRoleAsync(int roleId, CancellationToken cancellationToken = default)
+    public async Task<IList<int>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default)
     {
         var taskIds = await _tasks2Roles
             .Where(x => x.RoleId == roleId)

@@ -13,5 +13,49 @@
                 @Body
             </div>
         </div>
+        <a href="/task/create" class="fixed bottom-3 text-white right-14 flex justify-center items-center select-none border-2 text-white text-xl p-2 m-2 rounded-full shadow h-10 w-10 bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+        </a>
     </main>
 </div>
+
+
+<Button Color="Color.Primary" Clicked="@ShowModal">+</Button>
+
+<Modal @ref="modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Aufgabe erstellen</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Name</FieldLabel>
+                <TextEdit Placeholder="Enter name..." />
+            </Field>
+            <Field>
+                <FieldLabel>Surname</FieldLabel>
+                <TextEdit Placeholder="Enter surname..." />
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Schließen</Button>
+            <Button Color="Color.Primary" Clicked="@HideModal">Speichern</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+    // reference to the modal component
+    private Modal modalRef;
+
+    private Task ShowModal()
+    {
+        return modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+}

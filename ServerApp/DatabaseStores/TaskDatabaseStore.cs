@@ -71,7 +71,7 @@ public class TaskDatabaseStore : ITaskDatabaseStore
         return await tasks.ToListAsync();
     }
 
-    public async Task<IList<EntityTask>> GetTaskByUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IList<EntityTask>> GetTaskByUserAsync(string userId, CancellationToken cancellationToken = default)
     {
         var taskList = await tasks
             .Where(x => x.UserId.Equals(userId))

@@ -8,7 +8,7 @@ public class EntityTask2Role
     public int Id { get; set; }
 
     [Required]
-    public int RoleId {get; set;}
+    public string RoleId {get; set;}
 
     [Required]
     public int TaskId {get; set;}

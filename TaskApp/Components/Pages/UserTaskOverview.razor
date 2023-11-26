@@ -15,7 +15,7 @@
           Data="@tasks"
           ReadData="@OnReadData"
           TotalItems="@totalTasks"
-          PageSize="1"
+          PageSize="20"
           ShowPager
           Responsive>
     <DataGridCommandColumn />
@@ -58,58 +58,4 @@
             }
         }
     }
-
-
 }
-@* @if (Tasks == null || loggedInUser == null || claims.Count() <= 0)
-{
-    <p><em>Deine Aufgaben werden geladen...</em></p>
-}
-else
-{
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                    <th scope="col" class="px-6 py-3">Bezeichung</th>
-                    <th scope="col" class="px-6 py-3">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var task in Tasks)
-                {
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        <td class="px-6 py-4">@task.Title</td>
-                        <td class="px-6 py-4">@task.Status</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>    *@
-}
-
-@* @code {
-    List<TaskModel> Tasks = new List<TaskModel>();
-    UserBasic loggedInUser;
-
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthState { get; set; }
-    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
-
-    protected override async Task OnInitializedAsync()
-    { 
-        if (AuthState == null)
-        {
-            return;
-        }
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
-
-        var authState = await AuthState;
-        claims = authState.User.Claims;
-
-        Tasks = await _taskController.GetTasksByUserAsync();
-        StateHasChanged();
-    }
-
-} *@

@@ -14,7 +14,7 @@ public class EntityTask
 
     public DateTime StartDate {get; set;}
 
-    public Guid UserId { get; set; }
+    public string UserId { get; set; }
 
 
     public string Status { get; set; }

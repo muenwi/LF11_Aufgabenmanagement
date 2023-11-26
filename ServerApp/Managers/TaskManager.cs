@@ -44,7 +44,7 @@ public class TaskManager : ITaskManager
         return await _taskStore.GetTaskAsync(id, cancellationToken);
     }
 
-    public async Task<IList<EntityTask>> GetTaskByUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IList<EntityTask>> GetTaskByUserAsync(string userId, CancellationToken cancellationToken = default)
     {
         return await _taskStore.GetTaskByUserAsync(userId, cancellationToken);
     }
@@ -54,7 +54,7 @@ public class TaskManager : ITaskManager
         return await _taskStore.GetTasksAsync();
     }
 
-    public async Task<IList<EntityTask>> GetTasksByRole(int roleId, CancellationToken cancellationToken = default) {
+    public async Task<IList<EntityTask>> GetTasksByRole(string roleId, CancellationToken cancellationToken = default) {
         var taskIds = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
         
         var tasks = await _taskStore.GetTasksByIdsAsync(taskIds);
@@ -62,7 +62,7 @@ public class TaskManager : ITaskManager
         return tasks;
     }
 
-    public async Task CreateTask2RoleAsync(int taskId, int roleId, CancellationToken cancellationToken = default)
+    public async Task CreateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken = default)
     {
         var entity = new EntityTask2Role {
             RoleId = roleId,
@@ -73,7 +73,7 @@ public class TaskManager : ITaskManager
 
     }
 
-    public Task<EntityTask2Role> UpdateTask2RoleAsync(int taskId, int roleId, CancellationToken cancellationToken = default)
+    public Task<EntityTask2Role> UpdateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -83,12 +83,12 @@ public class TaskManager : ITaskManager
         throw new NotImplementedException();
     }
 
-    Task ITaskManager.UpdateTask2RoleAsync(int taskId, int roleId, CancellationToken cancellationToken)
+    Task ITaskManager.UpdateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<IList<EntityTask>> GetTasksByRoleAsync(int roleId, CancellationToken cancellationToken = default)
+    public async Task<IList<EntityTask>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default)
     {
         var taskIds = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
 
