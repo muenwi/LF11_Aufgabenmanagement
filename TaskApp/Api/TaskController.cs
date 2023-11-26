@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using TaskApp.Api.Interfaces;
@@ -28,8 +29,10 @@ public class TaskController : ITaskController
     {
         try
         {
+            var stringContent = new StringContent(JsonConvert.SerializeObject(newTask), Encoding.UTF8, "application/json");
+            var result = await _httpClient.PostAsync("/task", stringContent);
             return;
-        }catch (Exception ex)
+        }catch (Exception)
         {
             return;
         }

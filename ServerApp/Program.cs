@@ -6,11 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using ServerApp.AppContexts;
 using ServerApp.DatabaseStores;
 using ServerApp.DatabaseStores.Interfaces;
+using ServerApp.Dtos;
 using ServerApp.Entities;
 using ServerApp.Managers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// add CORS policy for Wasm client
+    
 // Add services to the container.
 builder.Services.AddAuthorizationBuilder();
 
@@ -19,30 +22,30 @@ builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdent
 builder.Services.AddDbContext<AppDbContext>(x => x.UseSqlite("DataSource=app.db"));
 builder.Services.AddDbContext<ServerAppDbContext>(x => x.UseSqlite("DataSource=serverapp.db"));
 
-
 builder.Services.AddIdentityCore<EntityAppUser>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddApiEndpoints();
 
-// add CORS policy for Wasm client
-builder.Services.AddCors(
-    options => options.AddPolicy(
-        "wasm",
-        policy => policy.WithOrigins([builder.Configuration["BackendUrl"] ?? "https://localhost:5001", 
-            builder.Configuration["FrontendUrl"] ?? "https://localhost:5002"])
-            .AllowAnyMethod()
-            .SetIsOriginAllowed(pol => true)
+builder.Services.AddCors(options => { options.AddPolicy(
+    name: "name",
+        policy =>
+        policy.WithOrigins("http://localhost:5148", "http://localhost:5297")
+            .AllowCredentials()
             .AllowAnyHeader()
-            .AllowCredentials()));
+            .AllowAnyMethod()
+    );
+});
 
 builder.Services.AddScoped<ITaskDatabaseStore, TaskDatabaseStore>();
 builder.Services.AddScoped<ITask2RoleDatabaseStore, Task2RoleDatabaseStore>();
 builder.Services.AddScoped<ITaskManager, TaskManager>();
 
+
+
+
 var app = builder.Build();
 
 // create routes for the identity endpoints
-app.MapIdentityApi<EntityAppUser>();
 
 // provide an end point to clear the cookie for logout
 app.MapPost("/Logout", async (ClaimsPrincipal user, SignInManager<EntityAppUser> signInManager) =>
@@ -51,18 +54,33 @@ app.MapPost("/Logout", async (ClaimsPrincipal user, SignInManager<EntityAppUser>
     return TypedResults.Ok();
 });
 
-app.MapPost("/task", async ([FromServices]ITaskManager manager, HttpContext context) =>
+app.MapPost("/task", async ([FromBody] TaskDto task,[FromServices] ITaskManager manager, HttpContext context) =>
 {
-    var task = await manager.CreateTaskAsync(new EntityTask{
-        Title = "First Task",
-        UserId = new Guid("ca3c3ab7-d540-45e1-946b-3f0fb0dea948"),
+    var entity = new EntityTask {
+        Title = task.Title,
+        Description = task.Description,
         StartDate = DateTime.Now,
-        Status = "Backlock",
-        Description = "This is the first task."
-    });
+        Status = task.Status,
+    };
+
+    EntityTask createdTask;
+
+    if (string.IsNullOrWhiteSpace(task.UserId)) {
+        if (string.IsNullOrWhiteSpace(task.Role)) throw new ArgumentNullException("The task is not assigned");
+
+        var roleId = (int)Enum.Parse(typeof(EntityRole.RoleName), task.Role);
+
+        entity.UserId = Guid.Empty;
+
+        createdTask = await manager.CreateTaskAsync(entity);
+
+        await manager.CreateTask2RoleAsync(createdTask.Id, roleId);
+    } else {
+        entity.UserId = new Guid(task.UserId);
+        createdTask = await manager.CreateTaskAsync(entity);
+    }
 
     if (task is null) throw new ArgumentNullException();
-    // if (task is null) return TypedResults.NotFound();
 
     return TypedResults.Ok();
 });
@@ -104,14 +122,9 @@ app.MapDelete("/task", async ([FromServices]ITaskManager manager, HttpContext co
     return TypedResults.Ok();
 });
 
+app.MapIdentityApi<EntityAppUser>();
 
-// activate the CORS policy
-app.UseCors("wasm");
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-}
+app.UseCors("name");
 
 app.UseHttpsRedirection();
 app.Run();

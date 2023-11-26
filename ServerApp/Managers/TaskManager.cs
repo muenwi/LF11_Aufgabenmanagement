@@ -62,4 +62,38 @@ public class TaskManager : ITaskManager
         return tasks;
     }
 
+    public async Task CreateTask2RoleAsync(int taskId, int roleId, CancellationToken cancellationToken = default)
+    {
+        var entity = new EntityTask2Role {
+            RoleId = roleId,
+            TaskId = taskId,
+        };
+
+        await _task2RoleStore.CreateAsync(entity);
+
+    }
+
+    public Task<EntityTask2Role> UpdateTask2RoleAsync(int taskId, int roleId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteTask2RoleAsync(EntityTask task, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task ITaskManager.UpdateTask2RoleAsync(int taskId, int roleId, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IList<EntityTask>> GetTasksByRoleAsync(int roleId, CancellationToken cancellationToken = default)
+    {
+        var taskIds = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
+
+        var tasks = await _taskStore.GetTasksByIdsAsync(taskIds, cancellationToken);
+
+        return tasks;
+    }
 }
