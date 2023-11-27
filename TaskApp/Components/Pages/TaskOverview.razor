@@ -7,9 +7,9 @@
 @attribute [StreamRendering]
 @inject ITaskController _taskController
 
-<PageTitle>persönlichen Aufgaben</PageTitle>
+<PageTitle>Alle Aufgaben</PageTitle>
 
-<h3>Aufgaben deiner Rolle.</h3>
+<h3>Alle Aufgaben</h3>
 
 <DataGrid TItem="TaskModel"
           Data="@tasks"
@@ -21,11 +21,12 @@
           Sortable
            SortMode="DataGridSortMode.Single">
      <DataGridCommandColumn />
-     <DataGridColumn Field="@nameof(TaskModel.Title)" Caption="Title" Editable />
-     <DataGridColumn Field="@nameof(TaskModel.Description)" Caption="Description" Editable />
-     <DataGridColumn Field="@nameof(TaskModel.Role)" Caption="Role" Editable />
+     <DataGridColumn Field="@nameof(TaskModel.Title)" Caption="Titel" Editable />
+     <DataGridColumn Field="@nameof(TaskModel.Description)" Caption="Beschreibung" Editable />
+     <DataGridColumn Field="@nameof(TaskModel.Role)" Caption="Rolle" Editable />
+     <DataGridColumn Field="@nameof(TaskModel.User)" Caption="Nutzer" Editable />
      <DataGridColumn Field="@nameof(TaskModel.Status)" Caption="Status" Editable />
-     <DataGridColumn Field="@nameof(TaskModel.Created)" Caption="Created" Editable />
+     <DataGridColumn Field="@nameof(TaskModel.Created)" Caption="Erstellt am" Editable />
  </DataGrid>
 
  @code {
