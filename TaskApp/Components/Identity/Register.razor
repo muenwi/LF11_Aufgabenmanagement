@@ -8,12 +8,12 @@
 
 <AuthorizeView>
     <Authorized>
-        <div class="alert alert-success">You're already logged in as @context.User.Identity?.Name.</div>
+        <div class="alert alert-success">Du bist als @context.User.Identity?.Name angemeldet.</div>
     </Authorized>
     <NotAuthorized>
         @if (success)
         {
-            <div class="alert alert-success">You successfully registered. Now you can <a href="login">login</a>.</div>
+            <div class="alert alert-success">You successfully registered. Now you can <a href="login">Login</a>.</div>
         }
         else
         {
@@ -33,7 +33,7 @@
                     <label for="password" class="block mb-0 text-sm font-medium text-gray-900 dark:text-black">Passwort</label>
                     <input @bind-value="password" type="password" id="password" style="text-align: left;" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="•••••••••" required>
 
-                    <label for="confirmPassword" class="block mb-0 text-sm font-medium text-gray-900 dark:text-black">Passwort betsätigen</label>
+                    <label for="confirmPassword" class="block mb-0 text-sm font-medium text-gray-900 dark:text-black">Passwort bestätigen</label>
                     <input @bind-value="confirmPassword" type="password" id="passwordInput" style="text-align: left;" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="•••••••••" required>
 
                 </div>

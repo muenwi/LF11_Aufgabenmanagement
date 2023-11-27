@@ -7,7 +7,7 @@
 <p class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">Loggen Sie sich ein!</p>
 <AuthorizeView>
     <Authorized>
-        <div class="alert alert-success">You're logged in as @context.User.Identity?.Name.</div>
+        <div class="alert alert-success">Du bist als @context.User.Identity?.Name angemeldet.</div>
     </Authorized>
     <NotAuthorized>
         @if (errors)
