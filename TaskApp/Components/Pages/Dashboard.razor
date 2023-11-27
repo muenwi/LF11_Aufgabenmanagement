@@ -1,0 +1,108 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@using TaskApp.Api.Interfaces
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ITaskController _taskController
+@inherits LayoutComponentBase
+
+<PageTitle>Home</PageTitle>
+
+<h1 class="mb-4 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl dark:text-black">Willkommen auf der Startseite des Aufgabenmanagement-Tools!</h1>
+
+<p class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">Sie können sich anmelden, wenn Sie bereits ein Konto haben, oder sich neu registrieren.</p>
+
+<div class="top-row px-4" style="margin-top: 20px;">
+    <AuthorizeView>
+        <NotAuthorized>
+            <a href="login">
+                <span class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      aria-hidden="true" style="vertical-align:middle">Login</span>
+            </a>
+            <a href="register">
+                <span class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" aria-hidden="true"
+                      style="vertical-align:middle">Registrieren</span>
+            </a>
+        </NotAuthorized>
+        <Authorized>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <Card>
+                        <CardBody>
+                            <CardTitle Size="3">
+                                Deine persönlichen Aufgaben
+                            </CardTitle>
+                            <CardText>
+                                @UserTaskNumber
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                    <Card>
+                        <CardBody>
+                            <CardTitle Size="3">
+                                Aufgaben von Rollen
+                            </CardTitle>
+                            <CardText>
+                                @RoleTasksNumber
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </div>
+                <PieChart @ref="pieChart" TItem="int" class="max-h-96 max-w-sm" />
+            </div>
+        </Authorized>
+    </AuthorizeView>
+</div>
+
+@code {
+    PieChart<int> pieChart;
+
+    int RoleTasksNumber = 0;
+    int UserTaskNumber = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await HandleRedraw();
+        }
+    }
+
+    async Task HandleRedraw()
+    {
+        await pieChart.Clear();
+
+        await pieChart.AddLabelsDatasetsAndUpdate(Labels, await GetLineChartDataset());
+    }
+
+    async Task<PieChartDataset<int>> GetLineChartDataset()
+    {
+        return new PieChartDataset<int>
+            {
+                Label = "# of randoms",
+                Data = await RandomizeData(),
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+            };
+    }
+
+    string[] Labels = { "Done", "Todo", "Stop", "Start" };
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+
+    async Task<List<int>> RandomizeData()
+    {
+        var statsData = await _taskController.GetStatsAsync();
+
+        RoleTasksNumber = statsData.AssignedViaRoleCount;
+        UserTaskNumber = statsData.PersonalTaskCount;
+
+        return new List<int> {
+            statsData.TaskDoneCount,
+            statsData.TaskTodoCount,
+            statsData.TaskStopCount,
+            statsData.TaskStartCount,
+        };
+    }
+}
+
+

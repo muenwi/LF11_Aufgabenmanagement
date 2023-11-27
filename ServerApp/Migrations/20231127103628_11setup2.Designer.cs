@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServerApp.AppContexts;
 
@@ -10,9 +11,11 @@ using ServerApp.AppContexts;
 namespace ServerApp.Migrations
 {
     [DbContext(typeof(ServerAppDbContext))]
-    partial class ServerAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231127103628_11setup2")]
+    partial class _11setup2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");

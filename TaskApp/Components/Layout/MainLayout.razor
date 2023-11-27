@@ -1,6 +1,10 @@
 ﻿@inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using TaskApp.Api.Interfaces
+@using TaskApp.Api.Models
+@using static TaskApp.Api.Models.RoleModel
+@inject ITaskController _taskController
 
 <div class="page">
     <div class="sidebar">
@@ -13,14 +17,11 @@
                 @Body
             </div>
         </div>
-        <a href="/task/create" class="fixed bottom-3 text-white right-14 flex justify-center items-center select-none border-2 text-white text-xl p-2 m-2 rounded-full shadow h-10 w-10 bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <Button Color="Color.Primary" Clicked="@ShowModal" class="fixed bottom-3 text-white right-14 flex justify-center items-center select-none border-2 text-white text-xl p-2 m-2 rounded-full shadow h-10 w-10 bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
             <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
-        </a>
+        </Button>
     </main>
 </div>
-
-
-<Button Color="Color.Primary" Clicked="@ShowModal">+</Button>
 
 <Modal @ref="modalRef">
     <ModalContent Centered>
@@ -29,23 +30,46 @@
             <CloseButton />
         </ModalHeader>
         <ModalBody>
-            <Field>
-                <FieldLabel>Name</FieldLabel>
-                <TextEdit Placeholder="Enter name..." />
+            <form>
+            <Field >
+                <FieldLabel>Status</FieldLabel>
+                    <Select @bind-SelectedValue="@Model.Status" TValue="string">
+                    @foreach (var name in Enum.GetNames(typeof(Status)))
+                    {
+                        <option>@name</option>
+                    }
+                </Select>
             </Field>
             <Field>
-                <FieldLabel>Surname</FieldLabel>
-                <TextEdit Placeholder="Enter surname..." />
+                <FieldLabel>Status</FieldLabel>
+                    <Select @bind-SelectedValue="@Model.Role" TValue="string">
+                    @foreach (var name in Enum.GetNames(typeof(RoleName)))
+                    {
+                        <option>@name</option>
+                    }
+                </Select>
             </Field>
+            <Field>
+                <FieldLabel>Titel</FieldLabel>
+                    <TextEdit Autofocus="true" @bind-Text="@Model.Title" Placeholder="Aufgaben Titel eingeben..." />
+            </Field>
+            <Field>
+                <FieldLabel>Beschreibung</FieldLabel>
+                    <textarea @bind="@Model.Description" Placeholder="Beschreibung eingeben..." class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            </Field>
+            </form>
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Secondary" Clicked="@HideModal">Schließen</Button>
-            <Button Color="Color.Primary" Clicked="@HideModal">Speichern</Button>
+            <Button Color="Color.Primary" Clicked="@Submit">Speichern</Button>
         </ModalFooter>
     </ModalContent>
 </Modal>
 
 @code {
+    [SupplyParameterFromForm]
+    public TaskModel Model { get; set; } = new TaskModel();
+
     // reference to the modal component
     private Modal modalRef;
 
@@ -57,5 +81,14 @@
     private Task HideModal()
     {
         return modalRef.Hide();
+    }
+
+    private async Task Submit()
+    {
+        if (Model is null) throw new Exception();
+
+        await _taskController.CreateTask(Model);
+
+        await modalRef.Hide();
     }
 }

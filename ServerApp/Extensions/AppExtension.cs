@@ -56,7 +56,7 @@ public static class AppExtension
             return TypedResults.Ok();
         });
 
-        app.MapPost("/setup-application/", async ([FromServices]ITaskManager manager, [FromServices]UserManager<EntityAppUser> _userManager, [FromServices]RoleManager<IdentityRole> _roleManager) => {
+        app.MapPost("/setup-application/user", async ([FromServices]ITaskManager manager, [FromServices]UserManager<EntityAppUser> _userManager, [FromServices]RoleManager<IdentityRole> _roleManager) => {
 
             foreach(var role in Enum.GetNames(typeof(EntityRole.RoleName))) {
 
@@ -69,36 +69,46 @@ public static class AppExtension
             }
         
             var peter = new EntityAppUser() {
-                UserName = "Peter",
+                Id = "17335b76-6cba-4a55-a6d6-69bae4db5832",
+                UserName = "peter@mail.com",
                 Email = "peter@mail.com",
+                EmailConfirmed = true,
             };
 
             await _userManager.CreateAsync(peter, "Test123$");
 
             var admin = new EntityAppUser() {
-                UserName = "Admin",
+                Id = "e39f1e55-fba8-4514-988e-e61b51438060",
+                UserName = "admin@mail.com",
                 Email = "admin@mail.com",
+                EmailConfirmed = true,
             };
 
             await _userManager.CreateAsync(admin, "Admin123$");
 
             var petra = new EntityAppUser() {
-                UserName = "Petra",
+                Id = "0b2390bc-420c-4676-8069-30c83d7925b2",
+                UserName = "petra@mail.com",//"Petra",
                 Email = "petra@mail.com",
+                EmailConfirmed = true,
             };
 
             await _userManager.CreateAsync(petra, "Petra123$");
 
             var klaus = new EntityAppUser() {
-                UserName = "Klaus",
+                Id = "2e3e9d45-320d-4f33-a3b7-429cf53ddd83",
+                UserName = "klaus@mail.com",
                 Email = "klaus@mail.com",
+                EmailConfirmed = true,
             };
 
             await _userManager.CreateAsync(klaus, "Klaus123$");
 
             var megan = new EntityAppUser() {
-                UserName = "Megan",
+                Id = "06c9c8fa-b8a1-4ba6-9dec-b78e97232675",
+                UserName = "megan@mail.com",
                 Email = "megan@mail.com",
+                EmailConfirmed = true,
             };
 
             await _userManager.CreateAsync(megan, "Megan123$");
@@ -117,7 +127,7 @@ public static class AppExtension
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Forschungsprojekt zum Klimawandel",
                 Description = "Führe ein umfassendes Forschungsprojekt zu den Auswirkungen des Klimawandels durch, einschließlich Ursachen, Folgen und möglichen Lösungen. Präsentiere deine Ergebnisse in einem detaillierten Bericht mit relevanten Diagrammen und visuellen Elementen.",
-                UserId = "ae1fa0e9-0624-47d8-b6e6-2830cd563d0f",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Todo",
                 StartDate = DateTime.Now,
             });
@@ -125,12 +135,12 @@ public static class AppExtension
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Literarische Analyse-Essay",
                 Description = "Wähle ein klassisches Literaturstück aus, das in diesem Semester studiert wurde, und schreibe einen eingehenden Analyse-Essay. Erforsche Themen, Charaktere und den Schreibstil des Autors, um ein tiefes Verständnis des Textes zu zeigen.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Todo",
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            var task1 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Mathematische Problemlösungsherausforderung",
                 Description = "Erstelle eine Reihe von anspruchsvollen Mathematikaufgaben, die kritisches Denken und Problemlösungsfähigkeiten erfordern. Löse jede Aufgabe schrittweise und erkläre die Argumentation hinter jeder Lösung.",
                 UserId = "",
@@ -138,15 +148,21 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
+            var ceoRole = await _roleManager.Roles.FirstOrDefaultAsync(x => x.Name.Equals("CEO"));
+
+            if (ceoRole is null) throw new ArgumentNullException();
+
+            await manager.CreateTask2RoleAsync(task1.Id, ceoRole.Id);
+
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Historische Zeitleistenpräsentation",
                 Description = "Entwickle eine visuelle Zeitleiste, die einen bestimmten historischen Zeitraum oder ein Ereignis abdeckt. Füge wichtige Daten, bedeutende Persönlichkeiten und Meilensteine ein. Präsentiere deine Zeitleiste vor der Klasse und betone den historischen Kontext.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Stop",
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            var task2 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Physikexperiment",
                 Description = "Entwerfe und führe ein Physikexperiment durch, um ein bestimmtes Konzept zu erforschen. Dokumentiere den Experimentverlauf, notiere Daten und analysiere die Ergebnisse. Fasse deine Erkenntnisse in einem wissenschaftlichen Bericht zusammen.",
                 UserId = "",
@@ -154,10 +170,12 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
+            await manager.CreateTask2RoleAsync(task2.Id, ceoRole.Id);
+
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Debatte über zeitgenössische Themen",
                 Description = "Beteilige dich an einer Klassendebatte zu einem aktuellen Thema. Recherchiere verschiedene Perspektiven, bereite Argumente vor und nimm an einer strukturierten Debatte teil, in der du deine Position verteidigst und auf gegnerische Standpunkte eingehst.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Done",
                 StartDate = DateTime.Now,
             });
@@ -165,12 +183,12 @@ public static class AppExtension
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Kreatives Schreiben Kurzgeschichte",
                 Description = "Verfasse eine Kurzgeschichte, die eine starke Erzählstruktur, Charakterentwicklung und effektive Verwendung literarischer Mittel zeigt. Teile deine Geschichte mit der Klasse und gib Einblicke in deinen kreativen Prozess.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Todo",
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            var task3 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Chemie-Laborbericht",
                 Description = "Führe ein Chemieexperiment durch, dokumentiere sorgfältig Verfahren und Beobachtungen. Schreibe einen umfassenden Laborbericht, der den Zweck des Experiments, die Methoden und Schlussfolgerungen sowie unerwartete Ergebnisse umfasst.",
                 UserId = "",
@@ -178,15 +196,17 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
+            await manager.CreateTask2RoleAsync(task3.Id, ceoRole.Id);
+
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Sprachaustausch zu Gesundheit und Wohlbefinden",
                 Description = "Paare dich mit einem Mitschüler zusammen, der eine andere Sprache lernt, und führe einen Gesprächsaustausch durch. Bereite eine Liste von Gesprächsthemen vor und übe das Sprechen in beiden Sprachen, um die Sprachkenntnisse zu verbessern.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Done",
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            var task4 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Geografie-Kartenprojekt",
                 Description = "Erstelle eine detaillierte Karte, die geografische Merkmale, kulturelle Aspekte und historische Sehenswürdigkeiten eines ausgewählten Landes hervorhebt. Präsentiere die Karte vor der Klasse und erkläre die Bedeutung jedes Elements.",
                 UserId = "",
@@ -194,7 +214,9 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            await manager.CreateTask2RoleAsync(task4.Id, ceoRole.Id);
+
+            var task5 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Gesundheits- und Wellness-Forschungsarbeit",
                 Description = "Untersuche ein gesundheitsbezogenes Thema, wie Ernährung, Bewegung oder psychische Gesundheit. Schreibe eine Forschungsarbeit, die das Thema erkundet, wissenschaftliche Studien zitiert und praktische Empfehlungen für einen gesunden Lebensstil gibt.",
                 UserId = "",
@@ -202,10 +224,12 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
+            await manager.CreateTask2RoleAsync(task5.Id, ceoRole.Id);
+
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Technologie-Innovationspräsentation",
                 Description = "Recherchiere eine kürzlich erfolgte technologische Innovation und erstelle eine Präsentation, die deren Auswirkungen auf die Gesellschaft, potenzielle Vorteile und ethische Überlegungen herausstellt. Diskutiere, wie die Innovation die Zukunft gestalten könnte.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Todo",
                 StartDate = DateTime.Now,
             });
@@ -213,12 +237,12 @@ public static class AppExtension
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Musikkompositionsprojekt",
                 Description = "Komponiere ein originelles Musikstück unter Verwendung der in der Klasse erlernten musikalischen Konzepte. Führe die Komposition vor der Klasse auf und analysiere kurz die verwendeten musikalischen Elemente.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Todo",
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            var task6 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Wirtschaftsfallstudienanalyse",
                 Description = "Analysiere eine real existierende wirtschaftliche Fallstudie unter Berücksichtigung von Faktoren wie Angebot und Nachfrage, Markttrends und staatlicher Intervention. Präsentiere deine Ergebnisse und schlage mögliche Lösungen oder politische Empfehlungen vor.",
                 UserId = "",
@@ -226,15 +250,17 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
+            await manager.CreateTask2RoleAsync(task6.Id, ceoRole.Id);
+
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Psychologie-Experiment und Bericht",
                 Description = "Entwickle ein Psychologieexperiment, um einen bestimmten Aspekt menschlichen Verhaltens zu untersuchen. Sammle und analysiere Daten und schreibe dann einen ausführlichen Bericht, der dein Experiment, die Ergebnisse und Schlussfolgerungen zusammenfasst.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Todo",
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            var task7 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Fitnessherausforderung im Sportunterricht",
                 Description = "Entwerfe eine Fitnessherausforderung, die verschiedene Übungen und Aktivitäten umfasst. Stelle die Herausforderung der Klasse vor, ermutige Mitschüler zur Teilnahme und verfolge ihren Fortschritt über einen festgelegten Zeitraum.",
                 UserId = "",
@@ -242,7 +268,9 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            await manager.CreateTask2RoleAsync(task7.Id, ceoRole.Id);
+
+            var task8 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Geschäftsplanentwicklung",
                 Description = "Entwickle einen umfassenden Geschäftsplan für eine hypothetische Geschäftsidee. Füge Details wie Marktanalyse, finanzielle Prognosen und eine Marketingstrategie ein. Präsentiere deinen Geschäftsplan vor der Klasse.",
                 UserId = "",
@@ -250,7 +278,9 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
-            await manager.CreateTaskAsync(new EntityTask() {
+            await manager.CreateTask2RoleAsync(task8.Id, ceoRole.Id);
+
+            var task9 = await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Umweltwissenschaftlicher Exkursionsbericht",
                 Description = "Nimm an einer umweltwissenschaftlichen Exkursion teil. Dokumentiere Beobachtungen, sammle Daten und mache Fotos. Schreibe einen detaillierten Bericht, der deine Erfahrungen und ökologischen Erkenntnisse zusammenfasst.",
                 UserId = "",
@@ -258,10 +288,12 @@ public static class AppExtension
                 StartDate = DateTime.Now,
             });
 
+            await manager.CreateTask2RoleAsync(task9.Id, ceoRole.Id);
+
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Kochvorführung in der kulinarischen Kunst",
                 Description = "Plane und führe eine Kochvorführung durch, die eine bestimmte kulinarische Technik oder ein Gericht zeigt. Gib schrittweise Anweisungen, teile Kochtipps mit und biete Kostproben für deine Mitschüler an.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Todo",
                 StartDate = DateTime.Now,
             });
@@ -269,7 +301,7 @@ public static class AppExtension
             await manager.CreateTaskAsync(new EntityTask() {
                 Title = "Kunst-Portfolio-Präsentation",
                 Description = "Stelle ein Portfolio deiner besten Kunstwerke zusammen, die während des Semesters erstellt wurden. Präsentiere dein Portfolio vor der Klasse, erkläre die Inspiration hinter jedem Werk und die künstlerischen Techniken, die angewendet wurden.",
-                UserId = "",
+                UserId = "e39f1e55-fba8-4514-988e-e61b51438060",
                 Status = "Todo",
                 StartDate = DateTime.Now,
             });

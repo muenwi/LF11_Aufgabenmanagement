@@ -17,7 +17,9 @@
           TotalItems="@totalTasks"
           PageSize="20"
           ShowPager
-          Responsive>
+          Responsive
+          Sortable
+          SortMode="DataGridSortMode.Single">
     <DataGridCommandColumn />
     <DataGridColumn Field="@nameof(TaskModel.Title)" Caption="Title" Editable />
     <DataGridColumn Field="@nameof(TaskModel.Description)" Caption="Description" Editable />
@@ -27,7 +29,7 @@
 </DataGrid>
 
 @code {
-    private List<TaskModel> tasks;
+    private List<TaskModel> tasks = new List<TaskModel>();
 
     protected override async Task OnInitializedAsync()
     {

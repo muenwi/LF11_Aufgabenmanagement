@@ -1,4 +1,4 @@
-﻿@page "/task/overview"
+﻿@page "/task/role/overview"
 @using TaskApp.Api.Interfaces
 @using System.Security.Claims
 @using TaskApp.Api.Models
@@ -47,15 +47,15 @@
 
             // this can be call to anything, in this case we're calling a fictional api
             if (e.ReadDataMode is DataGridReadDataMode.Virtualize)
-                response = (await _taskController.GetAllTasksAsync()).Skip(e.VirtualizeOffset).Take(e.VirtualizeCount).ToList();
+                response = (await _taskController.GetTasksByRoleAsync()).Skip(e.VirtualizeOffset).Take(e.VirtualizeCount).ToList();
             else if (e.ReadDataMode is DataGridReadDataMode.Paging)
-                response = (await _taskController.GetAllTasksAsync()).Skip((e.Page - 1) * e.PageSize).Take(e.PageSize).ToList();
+                response = (await _taskController.GetTasksByRoleAsync()).Skip((e.Page - 1) * e.PageSize).Take(e.PageSize).ToList();
             else
                 throw new Exception("Unhandled ReadDataMode");
 
             if (!e.CancellationToken.IsCancellationRequested)
             {
-                totalTasks = (await _taskController.GetAllTasksAsync()).Count;
+                totalTasks = (await _taskController.GetTasksByRoleAsync()).Count;
                 tasks = new List<TaskModel>(response); // an actual data for the current page
             }
         }

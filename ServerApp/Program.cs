@@ -9,17 +9,13 @@ using ServerApp.Managers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// add CORS policy for Wasm client
-    
-// Add services to the container.
-builder.Services.AddAuthorizationBuilder();
-
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
+builder.Services.AddAuthorizationBuilder();
 
 builder.Services.AddDbContext<AppDbContext>(x => x.UseSqlite("DataSource=app.db"));
 builder.Services.AddDbContext<ServerAppDbContext>(x => x.UseSqlite("DataSource=serverapp.db"));
 
-builder.Services.AddIdentityCore<EntityAppUser>()
+builder.Services.AddIdentityCore<EntityAppUser>(options => { options.SignIn.RequireConfirmedAccount = false; options.SignIn.RequireConfirmedPhoneNumber = false; options.SignIn.RequireConfirmedAccount = false;})
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddApiEndpoints();
@@ -43,7 +39,6 @@ var app = builder.Build();
 app.AddPostMethodes();
 app.AddGetMethodes();
 app.AddDeleteMethodes();
-
 
 app.MapIdentityApi<EntityAppUser>();
 

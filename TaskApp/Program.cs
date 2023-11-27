@@ -32,17 +32,18 @@ builder.Services.AddScoped<ITaskController, TaskController>();
 
 // set base address for default host
 builder.Services.AddScoped(sp =>
-    new HttpClient { BaseAddress = new Uri(builder.Configuration["FrontendUrl"] ?? "https://localhost:5002") });
+    new HttpClient { BaseAddress = new Uri("http://localhost:5148") });
 
 // configure client for auth interactions
 builder.Services.AddHttpClient(
     "Auth",
-    opt => opt.BaseAddress = new Uri(builder.Configuration["BackendUrl"] ?? "https://localhost:5001"))
+    opt => opt.BaseAddress = new Uri("http://localhost:5297"))
     .AddHttpMessageHandler<CookieHandler>();
 
 builder.Services
     .AddBlazorise()
     .AddTailwindProviders()
     .AddFontAwesomeIcons();
+
 
 await builder.Build().RunAsync();
