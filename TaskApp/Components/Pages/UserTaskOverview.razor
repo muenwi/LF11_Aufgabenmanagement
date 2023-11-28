@@ -24,8 +24,8 @@
     <DataGridColumn Field="@nameof(TaskModel.Title)" Caption="Titel" Editable />
     <DataGridColumn Field="@nameof(TaskModel.Description)" Caption="Beschreibung" Editable />
     <DataGridColumn Field="@nameof(TaskModel.Status)" Caption="Status"  Editable/>
-    <DataGridColumn Field="@nameof(TaskModel.StartDate)" Caption="Erstellt am" Editable/>
-</DataGrid>
+     <DataGridColumn Field="@nameof(TaskModel.Created)" Caption="Erstellt am" Editable />
+ </DataGrid>
 
 @code {
     private List<TaskModel> tasks = new List<TaskModel>();
