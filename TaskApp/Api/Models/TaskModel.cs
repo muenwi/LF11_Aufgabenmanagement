@@ -6,7 +6,8 @@ public class TaskModel
     public string Title {get; set;} = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
-    public string User { get; set; } = string.Empty;
-    public string Created { get; set; } = string.Empty;
+    public string UserId { get; set; } = string.Empty;
+    public string StartDate { get; set; } = string.Empty;
     public string Status {get; set;} = string.Empty;
+    public DateTime Created => DateTime.Parse(StartDate);
 }

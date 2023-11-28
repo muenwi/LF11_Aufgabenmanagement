@@ -11,4 +11,5 @@ public interface ITaskController
     public Task<List<TaskModel>> GetTasksByRoleAsync();
     public Task<List<TaskModel>> GetAllTasksAsync();
     public Task<GeneralDataModel> GetStatsAsync();
+    public Task<List<UserModel>> GetAllUserAsync();
 }

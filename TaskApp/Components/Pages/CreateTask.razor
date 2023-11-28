@@ -2,17 +2,39 @@
 @using static TaskApp.Api.Models.RoleModel
 @using TaskApp.Api.Models
 @using TaskApp.Api.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize]
 @inject ITaskController _taskController
+@inject NavigationManager _navigationManager
+@inject AuthenticationStateProvider _authenticationStateProvider
 
 <h3 style="font-size:40px">Aufgabe erstellen</h3>
 
 <form class="max-w-sm mx-auto" method="post" @onsubmit="Submit">
     <div class="mb-5">
-        <label for="task-app__status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Status</label>
+        <label for="ask-app__title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Titel</label>
+        <input @bind="@Model.Title" type="text" placeholder="Enter title..." id="task-app__title" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" required>
+    </div>
+    <div class="mb-5">
+        <label for="task-app__description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Beschreibung</label>
+        <textarea @bind="@Model.Description" id="task-app__description" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter description..."></textarea>
+    </div>
+
+    <div class="mb-5">
+        <label for="task-app__status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Aufgabenstatus</label>
         <select @bind="@Model.Status" placeholder="Select a status..." id="task-app__status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             @foreach(var name in Enum.GetNames(typeof(Status))) {
                 <option>@name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-5">
+        <label for="task-app__user" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Nutzer</label>
+        <select @bind="@Model.UserId" placeholder="Select a user" id="task-app__user" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            @foreach (var name in Users)
+            {
+                <option>@name.UserName</option>
             }
         </select>
     </div>
@@ -24,20 +46,26 @@
           }
       </select>
     </div>
-    <div class="mb-5">
-        <label for="ask-app__title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Titel</label>
-        <input @bind="@Model.Title" type="text" placeholder="Enter title..." id="task-app__title" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" required>
-    </div>
-    <div class="mb-5">
-        <label for="task-app__description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Beschreibung</label>
-        <textarea @bind="@Model.Description" id="task-app__description" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter description..."></textarea>
-    </div>
+    
   <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Aufgabe erstellen</button>
 </form>
 
 @code {
     [SupplyParameterFromForm]
     public TaskModel Model { get; set; } = new TaskModel();
+    [SupplyParameterFromForm]
+    public List<UserModel> Users { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = new List<UserModel>();
+        Users = await _taskController.GetAllUserAsync();
+
+        var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        Model.UserId = Users.FirstOrDefault(x => x.UserName.Equals(authenticationState.User.Identity?.Name))?.UserName ?? string.Empty;
+
+        await base.OnInitializedAsync();
+    }
 
     private async Task Submit()
     {

@@ -19,7 +19,9 @@ public static class AppExtension
             return TypedResults.Ok();
         });
 
-        app.MapPost("/task", async ([FromBody] TaskDto task, [FromServices] ITaskManager manager,[FromServices]RoleManager<IdentityRole> roleManager, HttpContext context) =>
+        app.MapPost("/task", async ([FromBody] TaskDto task, [FromServices] ITaskManager manager,
+            [FromServices]UserManager<EntityAppUser> UserManager,
+            [FromServices]RoleManager<IdentityRole> roleManager, HttpContext context) =>
         {
             var entity = new EntityTask
             {
@@ -47,7 +49,10 @@ public static class AppExtension
             }
             else
             {
-                entity.UserId = task.UserId;
+                var user = await UserManager.FindByEmailAsync(task.UserId);
+                if(user == null) throw new ArgumentNullException(nameof(IdentityUser));
+                
+                entity.UserId = user.Id;
                 createdTask = await manager.CreateTaskAsync(entity);
             }
 
@@ -352,15 +357,24 @@ public static class AppExtension
         });
         
         app.MapGet("/user-names", async ([FromServices]UserManager<EntityAppUser> _userManager) => {
-            var users = await _userManager.Users.Select( x => x.UserName).ToListAsync();
+            var users = await _userManager.Users.ToListAsync();
         
             return TypedResults.Json(users);
         });
         
-        app.MapGet("/all-tasks", async ([FromServices] ITaskManager manager) => {
+        app.MapGet("/all-tasks", async ([FromServices] ITaskManager manager, 
+            [FromServices] UserManager<EntityAppUser> _userManager) => {
             var tasks = await manager.GetTasksAsync();
-        
-            return TypedResults.Json(tasks);
+            foreach (var task in tasks)
+            {
+                var user = await _userManager.FindByEmailAsync(task.UserId ?? string.Empty);
+                if (user == null) task.UserId = string.Empty;
+
+                task.UserId = user?.UserName ?? string.Empty;
+            }
+            
+            var result = TypedResults.Json(tasks);
+            return result;
         });
 
         app.MapGet("/general-data", async ([FromServices] ITaskManager manager, [FromServices]UserManager<EntityAppUser> _userManager,[FromServices]RoleManager<IdentityRole> _roleManager,  ClaimsPrincipal user) => {

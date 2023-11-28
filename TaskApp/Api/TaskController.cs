@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Blazorise.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using TaskApp.Api.Interfaces;
@@ -9,7 +10,7 @@ namespace TaskApp.Api;
 
 public class TaskController : ITaskController
 {
-
+    private readonly ILogger<TaskController> _logger;
     private readonly JsonSerializerOptions jsonSerializerOptions =
     new()
     {
@@ -21,8 +22,12 @@ public class TaskController : ITaskController
     /// </summary>
     private readonly HttpClient _httpClient;
 
-    public TaskController(IHttpClientFactory httpClientFactory)
-        => _httpClient = httpClientFactory.CreateClient("Auth");
+    public TaskController(IHttpClientFactory httpClientFactory, ILogger<TaskController> logger)
+    {
+        _httpClient = httpClientFactory.CreateClient("Auth");
+        _logger = logger;
+    }
+       
 
     [Authorize]
     public async Task CreateTask(TaskModel newTask)
@@ -32,8 +37,9 @@ public class TaskController : ITaskController
             var stringContent = new StringContent(JsonConvert.SerializeObject(newTask), Encoding.UTF8, "application/json");
             var result = await _httpClient.PostAsync("/task", stringContent);
             return;
-        }catch (Exception)
+        }catch (Exception ex)
         {
+            _logger.LogError(ex, "could not create new task");
             return;
         }
     }
@@ -58,7 +64,7 @@ public class TaskController : ITaskController
             // body should contain details about why it failed
             var details = await result.Content.ReadAsStringAsync();
 
-            Console.WriteLine(details);
+            _logger.LogError(details, "could not read task");
             var a = JsonConvert.DeserializeObject<IEnumerable<TaskModel>>(details)?.ToList();
 
             return a ?? new List<TaskModel>();
@@ -138,6 +144,39 @@ public class TaskController : ITaskController
     }
 
     [Authorize]
+    public async Task<List<UserModel>> GetAllUserAsync()
+    {
+        string[] defaultDetail = ["An unknown error prevented registration from succeeding."];
+
+        try
+        {
+            var allUsers = await _httpClient.GetAsync("/user-names");
+
+            // successful?
+            if (!allUsers.IsSuccessStatusCode)
+            {
+                _logger.LogError("could not load all users");
+                return new List<UserModel>();
+            }
+            var usersDetails = await allUsers.Content.ReadAsStringAsync();
+
+            var allUsersList = JsonConvert.DeserializeObject<IEnumerable<UserModel>>(usersDetails);
+
+            if (allUsersList.IsNullOrEmpty())
+            {
+                _logger.LogError("could not find task");
+            }
+            return allUsersList?.ToList() ?? new List<UserModel>();
+        }catch(Exception ex)
+        {
+            _logger.LogError(ex, "http request failed");
+
+            Console.WriteLine("The http request failed...");
+        }
+        return new List<UserModel>();
+    }
+
+        [Authorize]
     public async Task<List<TaskModel>> GetAllTasksAsync()
     {
         string[] defaultDetail = ["An unknown error prevented registration from succeeding."];
@@ -145,28 +184,36 @@ public class TaskController : ITaskController
         try
         {
             // make the request
-            var result = await _httpClient.GetAsync("/all-tasks");
-
+            var allTasks = await _httpClient.GetAsync("/all-tasks");
 
             // successful?
-            if (!result.IsSuccessStatusCode)
+            if (!allTasks.IsSuccessStatusCode )
             {
+                _logger.LogError("could not load all tasks");
                 return new List<TaskModel>();
             }
 
             // body should contain details about why it failed
-            var details = await result.Content.ReadAsStringAsync();
+            var tasksDetails = await allTasks.Content.ReadAsStringAsync();
+            Console.WriteLine(tasksDetails);
+            var allTasksList = JsonConvert.DeserializeObject<IEnumerable<TaskModel>>(tasksDetails)?.ToList();
 
-            Console.WriteLine(details);
-            var a = JsonConvert.DeserializeObject<IEnumerable<TaskModel>>(details)?.ToList();
+            if (allTasksList.IsNullOrEmpty()) {
+                _logger.LogError("could not find task");
+                return new List<TaskModel>();
+            }
+           
+            _logger.LogInformation("could find task");
 
-            return a ?? new List<TaskModel>();
+            return allTasksList;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "http request failed");
+
             Console.WriteLine("The http request failed...");
         }
-
+        _logger.LogError("leere liste");
         return new List<TaskModel>();
     }
 }
