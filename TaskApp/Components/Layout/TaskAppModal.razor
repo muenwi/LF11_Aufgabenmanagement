@@ -8,11 +8,17 @@
                 <svg class="fill-white" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
             </button>
         </Tooltip>
+        <Tooltip Text="Aufgabe bearbeiten" Placement="TooltipPlacement.Left" AppendTo="#floating-action-edit-button">
+            <button id="floating-action-edit-button" @onclick="() => EditTask(Model)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+            </button>
+        </Tooltip>
         <Modal @ref="modalRef">
             <ModalContent Centered>
                 <ModalHeader>
-                    <ModalTitle>Aufgabe erstellen</ModalTitle>
-                    <CloseButton />
+            <ModalTitle>@(EditMode == TaskEditMode.Create ? "Aufgabe erstellen" : "Aufgabe bearbeiten")</ModalTitle>                    <CloseButton />
                 </ModalHeader>
                 <ModalBody>
                     <form>
@@ -42,21 +48,21 @@
                             }
                         </Select>
                     </Field>
-                <Field>
-                    <FieldLabel>Nutzer</FieldLabel>
-                    <Select @bind-SelectedValue="@Model.UserId" TValue="string">
-                        @foreach (var name in Users)
-                        {
-                            <option>@name.UserName</option>
-                        }
-                    </Select>
-                </Field>
+                    <Field>
+                        <FieldLabel>Nutzer</FieldLabel>
+                        <Select @bind-SelectedValue="@Model.UserId" TValue="string">
+                            @foreach (var name in Users)
+                            {
+                                <option>@name.UserName</option>
+                            }
+                        </Select>
+                    </Field>
                     
                     </form>
                 </ModalBody>
                 <ModalFooter>
                     <Button Color="Color.Secondary" Clicked="@HideModal">Schließen</Button>
-                    <Button Color="Color.Primary" Clicked="@Submit">Speichern</Button>
+                    <Button Color="Color.Primary" Clicked="@Submit">@((EditMode == TaskEditMode.Create ? "Erstellen" : "Speichern"))</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
@@ -67,7 +73,7 @@
     [SupplyParameterFromForm]
     public List<UserModel> Users { get; set; }
 
-    // reference to the modal component
+    private TaskEditMode EditMode { get; set; } = TaskEditMode.Create;
     private Modal modalRef;
 
     protected override async Task OnInitializedAsync()
@@ -75,27 +81,54 @@
         Users =  new List<UserModel>();
         Users = await _taskController.GetAllUserAsync();
         Users.Add(new UserModel());
-        Model.UserId = null;
 
         await base.OnInitializedAsync();
     }
 
-    private Task ShowModal()
+    private async Task EditTask(TaskModel task)
     {
-        return modalRef.Show();
-    }
-
-    private Task HideModal()
-    {
-        return modalRef.Hide();
+        if (task is not null)
+        {
+            Model = task;
+            modalRef.Show();
+        }
     }
 
     private async Task Submit()
     {
         if (Model is null) throw new Exception();
 
-        await _taskController.CreateTask(Model);
+        if (EditMode == TaskEditMode.Create)
+        {
+            await _taskController.CreateTask(Model);
+        }
+        else if (EditMode == TaskEditMode.Edit)
+        {
+            await _taskController.UpdateTask(Model);
+        }
 
         await modalRef.Hide();
+    }
+
+    public Task ShowModal()
+    {
+        return modalRef.Show();
+    }
+
+    public async Task ShowModalEdit(TaskModel task)
+    {
+        EditMode = TaskEditMode.Edit;
+        await EditTask(task);
+    }
+
+    public Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+
+    private enum TaskEditMode
+    {
+        Create,
+        Edit
     }
 }

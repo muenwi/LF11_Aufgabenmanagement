@@ -45,6 +45,22 @@ public class TaskController : ITaskController
     }
 
     [Authorize]
+    public async Task UpdateTask(TaskModel newTask)
+    {
+        try
+        {
+            var stringContent = new StringContent(JsonConvert.SerializeObject(newTask), Encoding.UTF8, "application/json");
+            var result = await _httpClient.PostAsync("/task", stringContent);
+            return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "could not update task");
+            return;
+        }
+    }
+
+    [Authorize]
     public async Task<List<TaskModel>> GetTasksByUserAsync()
     {
         string[] defaultDetail = ["An unknown error prevented registration from succeeding."];

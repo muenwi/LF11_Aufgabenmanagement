@@ -11,5 +11,4 @@ public class TaskModel
     public string UserId { get; set; } = string.Empty;
     public string StartDate { get; set; } = string.Empty;
     public string Status {get; set;} = string.Empty;
-    public DateTime Created => StartDate.IsNullOrEmpty() ? DateTime.Now : DateTime.Parse(StartDate);
 }
