@@ -333,29 +333,36 @@ public static class AppExtension
             return TypedResults.Json(tasks);
         });
         
-        app.MapGet("/task/role", async ([FromServices]ITaskManager manager, [FromServices]UserManager<EntityAppUser> _userManager, [FromServices]RoleManager<IdentityRole> _roleManager, ClaimsPrincipal user) => {
+
+        app.MapGet("/task/roleOverview", async ([FromServices] ITaskManager manager, [FromServices] UserManager<EntityAppUser> _userManager, [FromServices] RoleManager<IdentityRole> _roleManager, ClaimsPrincipal user) => {
+
             var identityUser = await _userManager.GetUserAsync(user);
 
             if (identityUser is null) throw new ArgumentNullException();
-        
+
+            //user roles
             var roles = await _userManager.GetRolesAsync(identityUser);
 
-            var tasks = new List<EntityTask>();
-        
-            var entityRoleList = _roleManager.Roles
-                .Where(x => roles.Contains(x.Name))
-                .Select(x => x.Id)
-                .ToList();
+            var tasks = new List<TaskDto>();
 
-            foreach (var roleId in entityRoleList) {
-            
-        
-                tasks.AddRange(await manager.GetTasksByRoleAsync(roleId));
+            foreach (var role in roles)
+            {
+                var tasksFromRole = await manager.GetTasksByRoleWithRolenameAsync(role);
+                tasks.AddRange(tasksFromRole.Select(x => new TaskDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    Description = x.Description,
+                    UserId = string.Empty,
+                    Status = x.Status,
+                    StartDate = x.StartDate.ToShortDateString(),
+                    Role = role
+                }));
             }
-        
+
             return TypedResults.Json(tasks);
         });
-        
+
         app.MapGet("/user-names", async ([FromServices]UserManager<EntityAppUser> _userManager) => {
             var users = await _userManager.Users.ToListAsync();
         

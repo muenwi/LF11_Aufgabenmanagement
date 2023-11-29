@@ -9,5 +9,5 @@ public interface ITask2RoleDatabaseStore
     public Task DeleteAsync(EntityTask2Role entity, CancellationToken cancellationToken = default);
     public Task<List<EntityTask2Role>> GetTask2RoleAsync(int taskId, CancellationToken cancellationToken = default);
     public Task<List<EntityTask2Role>> GetTasks2RolesAsync(CancellationToken cancellationToken = default);
-    public Task<List<int>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default);
+    public Task<List<EntityTask2Role>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default);
 }

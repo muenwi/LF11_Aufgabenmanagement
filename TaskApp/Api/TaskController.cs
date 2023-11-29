@@ -85,7 +85,7 @@ public class TaskController : ITaskController
         try
         {
             // make the request
-            var result = await _httpClient.GetAsync("/task/role");
+            var result = await _httpClient.GetAsync("/task/roleOverview");
 
 
             // successful?

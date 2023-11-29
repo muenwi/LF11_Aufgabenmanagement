@@ -74,9 +74,9 @@ public class TaskManager : ITaskManager
     }
 
     public async Task<IList<EntityTask>> GetTasksByRole(string roleId, CancellationToken cancellationToken = default) {
-        var taskIds = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
+        var tasks2roles = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
         
-        var tasks = await _taskStore.GetTasksByIdsAsync(taskIds);
+        var tasks = await _taskStore.GetTasksByIdsAsync(tasks2roles.Select(x => x.TaskId).ToList());
 
         return tasks;
     }
@@ -121,9 +121,34 @@ public class TaskManager : ITaskManager
 
     public async Task<IList<EntityTask>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default)
     {
-        var taskIds = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
+        var roles = await _roleManager.Roles.Where(x => x.Id == roleId).ToListAsync();
 
-        var tasks = await _taskStore.GetTasksByIdsAsync(taskIds, cancellationToken);
+        var rolesIds = roles.Select(x => x.Id).ToList();
+
+        var tasks2roles = new List<EntityTask2Role>();  
+        foreach (var roleId2 in rolesIds)
+        {
+            tasks2roles.AddRange(await _task2RoleStore.GetTasksByRoleAsync(roleId2, cancellationToken));
+        }
+
+        var tasks = await _taskStore.GetTasksByIdsAsync(tasks2roles.Select(x => x.TaskId).ToList(), cancellationToken);
+
+        return tasks;
+    }
+
+    public async Task<IList<EntityTask>> GetTasksByRoleWithRolenameAsync(string rolename, CancellationToken cancellationToken = default)
+    {
+        var roles = await _roleManager.Roles.Where(x => x.Name == rolename).ToListAsync();
+
+        var rolesIds = roles.Select(x => x.Id).ToList();
+
+        var tasks2roles = new List<EntityTask2Role>();
+        foreach (var roleId2 in rolesIds)
+        {
+            tasks2roles.AddRange(await _task2RoleStore.GetTasksByRoleAsync(roleId2, cancellationToken));
+        }
+
+        var tasks = await _taskStore.GetTasksByIdsAsync(tasks2roles.Select(x => x.TaskId).ToList(), cancellationToken);
 
         return tasks;
     }
