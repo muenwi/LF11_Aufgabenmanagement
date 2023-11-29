@@ -330,8 +330,17 @@ public static class AppExtension
         
             if (tasks is null) throw new ArgumentNullException();
         
-            return TypedResults.Json(tasks);
-        });
+            return TypedResults.Json(tasks.Select(x => new TaskDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    Description = x.Description,
+                    UserId = identityUser?.UserName ?? string.Empty,
+                    Status = x.Status,
+                    StartDate = x.StartDate.ToShortDateString(),
+                    Role = string.Empty
+                }));
+    });
         
 
         app.MapGet("/task/roleOverview", async ([FromServices] ITaskManager manager, [FromServices] UserManager<EntityAppUser> _userManager, [FromServices] RoleManager<IdentityRole> _roleManager, ClaimsPrincipal user) => {

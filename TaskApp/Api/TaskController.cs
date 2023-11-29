@@ -64,10 +64,17 @@ public class TaskController : ITaskController
             // body should contain details about why it failed
             var details = await result.Content.ReadAsStringAsync();
 
-            _logger.LogError(details, "could not read task");
-            var a = JsonConvert.DeserializeObject<IEnumerable<TaskModel>>(details)?.ToList();
+            var allTasksList = JsonConvert.DeserializeObject<IEnumerable<TaskModel>>(details)?.ToList();
 
-            return a ?? new List<TaskModel>();
+            if (allTasksList.IsNullOrEmpty())
+            {
+                _logger.LogError("could not find task");
+                return new List<TaskModel>();
+            }
+
+            _logger.LogInformation("could find task");
+
+            return allTasksList;
         }
         catch
         {
