@@ -48,7 +48,9 @@ public class TaskManager : ITaskManager
 
     public async Task<EntityTask> GetTaskAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _taskStore.GetTaskAsync(id, cancellationToken);
+        var task = await _taskStore.GetTaskAsync(id, cancellationToken);
+
+        return task;
     }
 
     public async Task<IList<EntityTask>> GetTaskByUserAsync(string userId, CancellationToken cancellationToken = default)
@@ -77,6 +79,11 @@ public class TaskManager : ITaskManager
         var tasks = await _taskStore.GetTasksByIdsAsync(taskIds);
 
         return tasks;
+    }
+
+    public async Task<IList<EntityTask2Role>> GetRole2Task(int taskId, CancellationToken cancellationToken = default)
+    {
+        return await _task2RoleStore.GetTask2RoleAsync(taskId,cancellationToken);
     }
 
     public async Task<IList<EntityTask2Role>> GetRole2Tasks(CancellationToken cancellationToken = default)

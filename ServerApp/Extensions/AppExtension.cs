@@ -389,6 +389,27 @@ public static class AppExtension
             return result;
         });
 
+        app.MapGet("/task", async ([FromServices] ITaskManager manager, 
+            [FromBody] int taskId) =>
+        {
+            var entity = await manager.GetTaskAsync(taskId);
+            var role2Tasks = await manager.GetRole2Task(taskId);
+
+            var taskDto = new TaskDto
+            {
+                Id = entity.Id,
+                Description = entity.Description,
+                Status = entity.Status,
+                StartDate = entity.StartDate.ToShortDateString(),
+                Title = entity.Title,
+                UserId = entity.UserId,
+                Role = role2Tasks.FirstOrDefault()?.RoleId ?? string.Empty
+            };
+
+            var result = TypedResults.Json(taskDto);
+            return result;
+        });
+
         app.MapGet("/general-data", async ([FromServices] ITaskManager manager, [FromServices]UserManager<EntityAppUser> _userManager,[FromServices]RoleManager<IdentityRole> _roleManager,  ClaimsPrincipal user) => {
             var identityUser = await _userManager.GetUserAsync(user);
         

@@ -14,5 +14,6 @@ public interface ITaskManager
     public Task<IList<EntityTask>> GetTasksAsync(CancellationToken cancellationToken = default);
     public Task<IList<EntityTask>> GetTaskByUserAsync(string userId, CancellationToken cancellationToken = default);
     public Task<IList<EntityTask2Role>> GetRole2Tasks(CancellationToken cancellationToken = default);
+    public Task<IList<EntityTask2Role>> GetRole2Task(int taskId, CancellationToken cancellationToken = default);
     public Task<IList<EntityTask>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default);
 }

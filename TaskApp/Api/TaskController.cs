@@ -176,7 +176,51 @@ public class TaskController : ITaskController
         return new List<UserModel>();
     }
 
-        [Authorize]
+    [Authorize]
+    public async Task<TaskModel> GetTaskToEdit(int taskId)
+    {
+        string[] defaultDetail = ["An unknown error prevented registration from succeeding."];
+
+        try
+        {
+            // make the request
+            var task = await _httpClient.GetAsync($"/task?taskId={taskId}");
+
+            // successful?
+            if (!task.IsSuccessStatusCode)
+            {
+                _logger.LogError("could not load task");
+                return new TaskModel();
+            }
+
+            // body should contain details about why it failed
+            var taskDetails = await task.Content.ReadAsStringAsync();
+            Console.WriteLine(taskDetails);
+
+            var taskToEdit = JsonConvert.DeserializeObject<IEnumerable<TaskModel>>(taskDetails)?.FirstOrDefault();
+
+            if (taskToEdit == null)
+            {
+                _logger.LogError("could not find task");
+                return new TaskModel();
+            }
+
+            _logger.LogInformation("could find task");
+
+            return taskToEdit;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "http request failed");
+
+            Console.WriteLine("The http request failed...");
+        }
+        _logger.LogError("kein task");
+        return new TaskModel();
+    }
+
+
+    [Authorize]
     public async Task<List<TaskModel>> GetAllTasksAsync()
     {
         string[] defaultDetail = ["An unknown error prevented registration from succeeding."];

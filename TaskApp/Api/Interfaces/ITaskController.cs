@@ -12,4 +12,6 @@ public interface ITaskController
     public Task<List<TaskModel>> GetAllTasksAsync();
     public Task<GeneralDataModel> GetStatsAsync();
     public Task<List<UserModel>> GetAllUserAsync();
+    public Task<TaskModel> GetTaskToEdit(int taskId);
+
 }

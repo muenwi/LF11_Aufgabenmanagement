@@ -48,6 +48,16 @@ public class Task2RoleDatabaseStore : ITask2RoleDatabaseStore
         return taskIds;
     }
 
+    public async Task<List<EntityTask2Role>> GetTask2RoleAsync(int taskId,CancellationToken cancellationToken = default)
+    {
+        var taskIds = await _tasks2Roles
+            .Where(x => x.TaskId == taskId)
+            .Distinct()
+            .ToListAsync();
+
+        return taskIds;
+    }
+
     public async Task<List<EntityTask2Role>> GetTasks2RolesAsync(CancellationToken cancellationToken = default)
     {
         var taskIds = await _tasks2Roles
