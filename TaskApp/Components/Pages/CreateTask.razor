@@ -7,7 +7,6 @@
 @attribute [Authorize]
 @inject ITaskController _taskController
 @inject NavigationManager _navigationManager
-@inject AuthenticationStateProvider _authenticationStateProvider
 
 <h3 style="font-size:40px">Aufgabe erstellen</h3>
 
@@ -60,10 +59,8 @@
     {
         Users = new List<UserModel>();
         Users = await _taskController.GetAllUserAsync();
-
-        var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        Model.UserId = Users.FirstOrDefault(x => x.UserName.Equals(authenticationState.User.Identity?.Name))?.UserName ?? string.Empty;
-
+        Users.Add(new UserModel());
+        Model.UserId = null;
         await base.OnInitializedAsync();
     }
 

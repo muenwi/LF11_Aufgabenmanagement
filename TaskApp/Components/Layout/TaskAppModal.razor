@@ -2,7 +2,6 @@
 @using TaskApp.Api.Models
 @using static TaskApp.Api.Models.RoleModel
 @inject ITaskController _taskController
-@inject AuthenticationStateProvider _authenticationStateProvider
 
         <Tooltip Text="Aufgabe erstellen" Placement="TooltipPlacement.Left" AppendTo="#floating-action-button">
             <button id="floating-action-button" Color="Color.Light" @onclick="@ShowModal" class="w-16 h-16 fixed bottom-3 text-white right-14 flex justify-center items-center select-none border-2 text-white text-xl p-2 m-2 rounded-full shadow h-10 w-10 bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -75,10 +74,8 @@
     {
         Users =  new List<UserModel>();
         Users = await _taskController.GetAllUserAsync();
-
-
-        var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        Model.UserId = Users.FirstOrDefault(x => x.UserName.Equals(authenticationState.User.Identity?.Name))?.UserName ?? string.Empty;
+        Users.Add(new UserModel());
+        Model.UserId = null;
 
         await base.OnInitializedAsync();
     }

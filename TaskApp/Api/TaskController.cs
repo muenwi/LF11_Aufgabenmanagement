@@ -187,7 +187,7 @@ public class TaskController : ITaskController
             var allTasks = await _httpClient.GetAsync("/all-tasks");
 
             // successful?
-            if (!allTasks.IsSuccessStatusCode )
+            if (!allTasks.IsSuccessStatusCode)
             {
                 _logger.LogError("could not load all tasks");
                 return new List<TaskModel>();
@@ -196,6 +196,8 @@ public class TaskController : ITaskController
             // body should contain details about why it failed
             var tasksDetails = await allTasks.Content.ReadAsStringAsync();
             Console.WriteLine(tasksDetails);
+
+           
             var allTasksList = JsonConvert.DeserializeObject<IEnumerable<TaskModel>>(tasksDetails)?.ToList();
 
             if (allTasksList.IsNullOrEmpty()) {

@@ -363,17 +363,29 @@ public static class AppExtension
         });
         
         app.MapGet("/all-tasks", async ([FromServices] ITaskManager manager, 
-            [FromServices] UserManager<EntityAppUser> _userManager) => {
+            [FromServices] UserManager<EntityAppUser> _userManager,
+            [FromServices] RoleManager<IdentityRole> _roleManager) => {
             var tasks = await manager.GetTasksAsync();
             foreach (var task in tasks)
             {
-                var user = await _userManager.FindByEmailAsync(task.UserId ?? string.Empty);
-                if (user == null) task.UserId = string.Empty;
+                    if (task.UserId != null)
+                    {                   
+                        var user = await _userManager.FindByEmailAsync(task.UserId);
+                        if (user == null) task.UserId = string.Empty;
 
-                task.UserId = user?.UserName ?? string.Empty;
+                        task.UserId = user?.UserName ?? string.Empty;
+                    }
             }
+            var rolesToTasks = await manager.GetRole2Tasks();
+            var entityRoleList = await _roleManager.Roles.ToListAsync();
+
+            var tasksDto = tasks.Select(x => new TaskDto 
+            { Id = x.Id, Description = x.Description, Status = x.Status, 
+                Title = x.Title, StartDate = x.StartDate.ToShortDateString(), UserId = x.UserId, 
+                Role = entityRoleList?.FirstOrDefault(r => r.Id.Equals(rolesToTasks.FirstOrDefault(y => y.TaskId == x.Id)?.RoleId))?.Name ?? string.Empty,
+            }).ToList();
             
-            var result = TypedResults.Json(tasks);
+            var result = TypedResults.Json(tasksDto);
             return result;
         });
 

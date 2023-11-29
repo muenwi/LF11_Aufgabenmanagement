@@ -79,6 +79,13 @@ public class TaskManager : ITaskManager
         return tasks;
     }
 
+    public async Task<IList<EntityTask2Role>> GetRole2Tasks(CancellationToken cancellationToken = default)
+    {
+        var tasks2Roles = await _task2RoleStore.GetTasks2RolesAsync(cancellationToken);
+        
+        return tasks2Roles;
+    }
+
     public async Task CreateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken = default)
     {
         var entity = new EntityTask2Role {
