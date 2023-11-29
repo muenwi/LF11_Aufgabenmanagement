@@ -48,7 +48,9 @@ public class TaskManager : ITaskManager
 
     public async Task<EntityTask> GetTaskAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _taskStore.GetTaskAsync(id, cancellationToken);
+        var task = await _taskStore.GetTaskAsync(id, cancellationToken);
+
+        return task;
     }
 
     public async Task<IList<EntityTask>> GetTaskByUserAsync(string userId, CancellationToken cancellationToken = default)
@@ -72,11 +74,23 @@ public class TaskManager : ITaskManager
     }
 
     public async Task<IList<EntityTask>> GetTasksByRole(string roleId, CancellationToken cancellationToken = default) {
-        var taskIds = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
+        var tasks2roles = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
         
-        var tasks = await _taskStore.GetTasksByIdsAsync(taskIds);
+        var tasks = await _taskStore.GetTasksByIdsAsync(tasks2roles.Select(x => x.TaskId).ToList());
 
         return tasks;
+    }
+
+    public async Task<IList<EntityTask2Role>> GetRole2Task(int taskId, CancellationToken cancellationToken = default)
+    {
+        return await _task2RoleStore.GetTask2RoleAsync(taskId,cancellationToken);
+    }
+
+    public async Task<IList<EntityTask2Role>> GetRole2Tasks(CancellationToken cancellationToken = default)
+    {
+        var tasks2Roles = await _task2RoleStore.GetTasks2RolesAsync(cancellationToken);
+        
+        return tasks2Roles;
     }
 
     public async Task CreateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken = default)
@@ -95,9 +109,18 @@ public class TaskManager : ITaskManager
         throw new NotImplementedException();
     }
 
-    public Task DeleteTask2RoleAsync(EntityTask task, CancellationToken cancellationToken = default)
+    public async Task DeleteTaskAndTask2Roles(int task, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var entityTask2Role = await _task2RoleStore.GetTask2RoleAsync(task, cancellationToken);
+
+        foreach (var role in entityTask2Role)
+        {
+            await _task2RoleStore.DeleteAsync(role);
+        }
+
+        var entityTask = await _taskStore.GetTaskAsync(task, cancellationToken);
+        await _taskStore.DeleteAsync(entityTask);
+        return;
     }
 
     Task ITaskManager.UpdateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken)
@@ -107,9 +130,34 @@ public class TaskManager : ITaskManager
 
     public async Task<IList<EntityTask>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default)
     {
-        var taskIds = await _task2RoleStore.GetTasksByRoleAsync(roleId, cancellationToken);
+        var roles = await _roleManager.Roles.Where(x => x.Id == roleId).ToListAsync();
 
-        var tasks = await _taskStore.GetTasksByIdsAsync(taskIds, cancellationToken);
+        var rolesIds = roles.Select(x => x.Id).ToList();
+
+        var tasks2roles = new List<EntityTask2Role>();  
+        foreach (var roleId2 in rolesIds)
+        {
+            tasks2roles.AddRange(await _task2RoleStore.GetTasksByRoleAsync(roleId2, cancellationToken));
+        }
+
+        var tasks = await _taskStore.GetTasksByIdsAsync(tasks2roles.Select(x => x.TaskId).ToList(), cancellationToken);
+
+        return tasks;
+    }
+
+    public async Task<IList<EntityTask>> GetTasksByRoleWithRolenameAsync(string rolename, CancellationToken cancellationToken = default)
+    {
+        var roles = await _roleManager.Roles.Where(x => x.Name == rolename).ToListAsync();
+
+        var rolesIds = roles.Select(x => x.Id).ToList();
+
+        var tasks2roles = new List<EntityTask2Role>();
+        foreach (var roleId2 in rolesIds)
+        {
+            tasks2roles.AddRange(await _task2RoleStore.GetTasksByRoleAsync(roleId2, cancellationToken));
+        }
+
+        var tasks = await _taskStore.GetTasksByIdsAsync(tasks2roles.Select(x => x.TaskId).ToList(), cancellationToken);
 
         return tasks;
     }

@@ -320,6 +320,7 @@ public static class AppExtension
 
     public static WebApplication AddGetMethodes(this WebApplication app)
     {
+
         app.MapGet("/task/user", async ([FromServices]ITaskManager manager, [FromServices]UserManager<EntityAppUser> _userManager,  ClaimsPrincipal user) =>
         {
             var identityUser = await _userManager.GetUserAsync(user);
@@ -330,32 +331,48 @@ public static class AppExtension
         
             if (tasks is null) throw new ArgumentNullException();
         
-            return TypedResults.Json(tasks);
-        });
+            return TypedResults.Json(tasks.Select(x => new TaskDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    Description = x.Description,
+                    UserId = identityUser?.UserName ?? string.Empty,
+                    Status = x.Status,
+                    StartDate = x.StartDate.ToShortDateString(),
+                    Role = string.Empty
+                }));
+    });
         
-        app.MapGet("/task/role", async ([FromServices]ITaskManager manager, [FromServices]UserManager<EntityAppUser> _userManager, [FromServices]RoleManager<IdentityRole> _roleManager, ClaimsPrincipal user) => {
+
+        app.MapGet("/task/roleOverview", async ([FromServices] ITaskManager manager, [FromServices] UserManager<EntityAppUser> _userManager, [FromServices] RoleManager<IdentityRole> _roleManager, ClaimsPrincipal user) => {
+
             var identityUser = await _userManager.GetUserAsync(user);
 
             if (identityUser is null) throw new ArgumentNullException();
-        
+
+            //user roles
             var roles = await _userManager.GetRolesAsync(identityUser);
 
-            var tasks = new List<EntityTask>();
-        
-            var entityRoleList = _roleManager.Roles
-                .Where(x => roles.Contains(x.Name))
-                .Select(x => x.Id)
-                .ToList();
+            var tasks = new List<TaskDto>();
 
-            foreach (var roleId in entityRoleList) {
-            
-        
-                tasks.AddRange(await manager.GetTasksByRoleAsync(roleId));
+            foreach (var role in roles)
+            {
+                var tasksFromRole = await manager.GetTasksByRoleWithRolenameAsync(role);
+                tasks.AddRange(tasksFromRole.Select(x => new TaskDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    Description = x.Description,
+                    UserId = string.Empty,
+                    Status = x.Status,
+                    StartDate = x.StartDate.ToShortDateString(),
+                    Role = role
+                }));
             }
-        
+
             return TypedResults.Json(tasks);
         });
-        
+
         app.MapGet("/user-names", async ([FromServices]UserManager<EntityAppUser> _userManager) => {
             var users = await _userManager.Users.ToListAsync();
         
@@ -363,17 +380,50 @@ public static class AppExtension
         });
         
         app.MapGet("/all-tasks", async ([FromServices] ITaskManager manager, 
-            [FromServices] UserManager<EntityAppUser> _userManager) => {
+            [FromServices] UserManager<EntityAppUser> _userManager,
+            [FromServices] RoleManager<IdentityRole> _roleManager) => {
             var tasks = await manager.GetTasksAsync();
             foreach (var task in tasks)
             {
-                var user = await _userManager.FindByEmailAsync(task.UserId ?? string.Empty);
-                if (user == null) task.UserId = string.Empty;
+                    if (task.UserId != null)
+                    {                   
+                        var user = await _userManager.FindByEmailAsync(task.UserId);
+                        if (user == null) task.UserId = string.Empty;
 
-                task.UserId = user?.UserName ?? string.Empty;
+                        task.UserId = user?.UserName ?? string.Empty;
+                    }
             }
+            var rolesToTasks = await manager.GetRole2Tasks();
+            var entityRoleList = await _roleManager.Roles.ToListAsync();
+
+            var tasksDto = tasks.Select(x => new TaskDto 
+            { Id = x.Id, Description = x.Description, Status = x.Status, 
+                Title = x.Title, StartDate = x.StartDate.ToShortDateString(), UserId = x.UserId, 
+                Role = entityRoleList?.FirstOrDefault(r => r.Id.Equals(rolesToTasks.FirstOrDefault(y => y.TaskId == x.Id)?.RoleId))?.Name ?? string.Empty,
+            }).ToList();
             
-            var result = TypedResults.Json(tasks);
+            var result = TypedResults.Json(tasksDto);
+            return result;
+        });
+
+        app.MapGet("/task", async ([FromServices] ITaskManager manager, 
+            [FromBody] int taskId) =>
+        {
+            var entity = await manager.GetTaskAsync(taskId);
+            var role2Tasks = await manager.GetRole2Task(taskId);
+
+            var taskDto = new TaskDto
+            {
+                Id = entity.Id,
+                Description = entity.Description,
+                Status = entity.Status,
+                StartDate = entity.StartDate.ToShortDateString(),
+                Title = entity.Title,
+                UserId = entity.UserId,
+                Role = role2Tasks.FirstOrDefault()?.RoleId ?? string.Empty
+            };
+
+            var result = TypedResults.Json(taskDto);
             return result;
         });
 
@@ -439,15 +489,33 @@ public static class AppExtension
 
     public static WebApplication AddDeleteMethodes(this WebApplication app)
     {
-        app.MapDelete("/task", async ([FromServices] ITaskManager manager, HttpContext context) =>
+        app.MapDelete("/task-delete", async (HttpContext context) =>
         {
-            return TypedResults.Ok();
+            if (int.TryParse(context.Request.Query["taskId"], out int taskId))
+            {
+                // Holen Sie die benötigten Dienste aus dem Kontext
+                var manager = context.RequestServices.GetRequiredService<ITaskManager>();
+
+                // Führen Sie die Aktion aus
+                await manager.DeleteTaskAndTask2Roles(taskId);
+
+                // Geben Sie eine Erfolgsantwort zurück
+                context.Response.StatusCode = 200;
+                await context.Response.WriteAsync("OK");
+            }
+            else
+            {
+                // Handle the case where taskId is not provided or not a valid integer.
+                context.Response.StatusCode = 400; // Bad Request
+                await context.Response.WriteAsync("Bad Request");
+            }
         });
 
         return app;
     }
 
-    
+
+
     public static WebApplication AddPutMethodes(this WebApplication app)
     {
         app.MapPut("/task", async ([FromServices] ITaskManager manager, [FromBody]TaskDto task) =>

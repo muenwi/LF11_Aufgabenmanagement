@@ -1,4 +1,5 @@
 ﻿@page "/task/role/overview"
+@using System.Drawing
 @using TaskApp.Api.Interfaces
 @using System.Security.Claims
 @using TaskApp.Api.Models
@@ -14,6 +15,9 @@
 <DataGrid TItem="TaskModel"
           Data="@tasks"
           ReadData="@OnReadData"
+          SelectedRow="@selectedTask"
+          RowContextMenu="@OnRowContextMenu"
+          RowContextMenuPreventDefault="true"
           TotalItems="@totalTasks"
           PageSize="20"
           ShowPager
@@ -25,15 +29,54 @@
      <DataGridColumn Field="@nameof(TaskModel.Description)" Caption="Beschreibung" Editable />
      <DataGridColumn Field="@nameof(TaskModel.Role)" Caption="Rolle" Editable />
      <DataGridColumn Field="@nameof(TaskModel.Status)" Caption="Status" Editable />
-     <DataGridColumn Field="@nameof(TaskModel.Created)" Caption="Erstellt am" Editable />
+     <DataGridColumn Field="@nameof(TaskModel.StartDate)" Caption="Erstellt am" Editable />
  </DataGrid>
+
+
+ @if (showContextMenu && selectedTask != null)
+{
+    <Div Position="Position.Fixed" Background="Background.Transparent" Style="@($"left:{contextMenuPos.X}px;top:{contextMenuPos.Y}px;")">
+        <ListGroup>
+            <ListGroupItem>
+                <button @onclick="@(()=>OnContextItemEditClicked(contextMenueTask))"
+                        type="button"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    <Icon Name="IconName.Edit" TextColor="TextColor.Secondary"></Icon>
+                    Aufgabe bearbeiten
+                </button>
+            </ListGroupItem>
+            <ListGroupItem>
+                <button @onclick="@(()=>OnContextItemDeleteClicked(contextMenueTask))"
+                        type="button"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    <Icon Name="IconName.Delete" TextColor="TextColor.Secondary"></Icon>
+                    Aufgabe löschen
+                </button>
+            </ListGroupItem>
+        </ListGroup>
+    </Div>
+}
+
+@if (showEditModal)
+{
+    <TaskAppModal @ref="editModalRef" />
+}
+
 
  @code {
     private List<TaskModel> tasks = new List<TaskModel>();
+    private TaskModel selectedTask;
+    private TaskAppModal editModalRef;
+    private DataGrid<TaskModel> dataGridRef;
+
+    bool showContextMenu = false;
+    private bool showEditModal = false;
+    TaskModel contextMenueTask;
+    Point contextMenuPos;
 
     protected override async Task OnInitializedAsync()
     {
-        tasks = await _taskController.GetTasksByUserAsync(); ;
+        tasks = await _taskController.GetTasksByRoleAsync(); ;
         await base.OnInitializedAsync();
     }
 
@@ -59,5 +102,38 @@
                 tasks = new List<TaskModel>(response); // an actual data for the current page
             }
         }
+    }
+
+
+    protected Task OnRowContextMenu(DataGridRowMouseEventArgs<TaskModel> eventArgs)
+    {
+        showContextMenu = true;
+        contextMenueTask = eventArgs.Item;
+        showEditModal = true;
+        contextMenuPos = eventArgs.MouseEventArgs.Client;
+
+        return Task.CompletedTask;
+    }
+
+    protected async Task OnContextItemEditClicked(TaskModel task)
+    {
+        showContextMenu = false;
+        await editModalRef.ShowModalEdit(task);
+    }
+
+    protected async Task OnContextItemDeleteClicked(TaskModel task)
+    {
+        showContextMenu = false;
+        await _taskController.DeleteTask(task);
+    }
+
+    private Task ShowModal()
+    {
+        return editModalRef.ShowModal();
+    }
+
+    private Task HideModal()
+    {
+        return editModalRef.HideModal();
     }
 }

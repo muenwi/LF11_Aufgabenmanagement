@@ -19,4 +19,8 @@ public class TaskDto
     public string Role { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
     public string Status {get; set;} = string.Empty;
+    public string StartDate { get; set; } = string.Empty;
+    public DateTime Created => StartDate == null ? DateTime.Now : DateTime.Parse(StartDate);
+
+
 }

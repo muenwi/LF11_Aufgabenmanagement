@@ -37,11 +37,29 @@ public class Task2RoleDatabaseStore : ITask2RoleDatabaseStore
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IList<int>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default)
+    public async Task<List<EntityTask2Role>> GetTasksByRoleAsync(string roleId, CancellationToken cancellationToken = default)
     {
         var taskIds = await _tasks2Roles
             .Where(x => x.RoleId == roleId)
-            .Select(x => x.TaskId)
+            .Distinct()
+            .ToListAsync();
+
+        return taskIds;
+    }
+
+    public async Task<List<EntityTask2Role>> GetTask2RoleAsync(int taskId,CancellationToken cancellationToken = default)
+    {
+        var taskIds = await _tasks2Roles
+            .Where(x => x.TaskId == taskId)
+            .Distinct()
+            .ToListAsync();
+
+        return taskIds;
+    }
+
+    public async Task<List<EntityTask2Role>> GetTasks2RolesAsync(CancellationToken cancellationToken = default)
+    {
+        var taskIds = await _tasks2Roles
             .Distinct()
             .ToListAsync();
 
