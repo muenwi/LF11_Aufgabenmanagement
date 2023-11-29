@@ -60,6 +60,17 @@
     int RoleTasksNumber = 0;
     int UserTaskNumber = 0;
 
+    protected override async Task OnInitializedAsync()
+    {
+        var usertasks = await _taskController.GetTasksByUserAsync();
+        UserTaskNumber = usertasks.Count();
+
+        var roleTasks = await _taskController.GetTasksByRoleAsync();
+        RoleTasksNumber = roleTasks.Count();
+
+        await base.OnInitializedAsync();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
