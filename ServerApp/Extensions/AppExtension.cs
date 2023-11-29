@@ -320,6 +320,7 @@ public static class AppExtension
 
     public static WebApplication AddGetMethodes(this WebApplication app)
     {
+
         app.MapGet("/task/user", async ([FromServices]ITaskManager manager, [FromServices]UserManager<EntityAppUser> _userManager,  ClaimsPrincipal user) =>
         {
             var identityUser = await _userManager.GetUserAsync(user);
@@ -488,15 +489,33 @@ public static class AppExtension
 
     public static WebApplication AddDeleteMethodes(this WebApplication app)
     {
-        app.MapDelete("/task", async ([FromServices] ITaskManager manager, HttpContext context) =>
+        app.MapDelete("/task-delete", async (HttpContext context) =>
         {
-            return TypedResults.Ok();
+            if (int.TryParse(context.Request.Query["taskId"], out int taskId))
+            {
+                // Holen Sie die benötigten Dienste aus dem Kontext
+                var manager = context.RequestServices.GetRequiredService<ITaskManager>();
+
+                // Führen Sie die Aktion aus
+                await manager.DeleteTaskAndTask2Roles(taskId);
+
+                // Geben Sie eine Erfolgsantwort zurück
+                context.Response.StatusCode = 200;
+                await context.Response.WriteAsync("OK");
+            }
+            else
+            {
+                // Handle the case where taskId is not provided or not a valid integer.
+                context.Response.StatusCode = 400; // Bad Request
+                await context.Response.WriteAsync("Bad Request");
+            }
         });
 
         return app;
     }
 
-    
+
+
     public static WebApplication AddPutMethodes(this WebApplication app)
     {
         app.MapPut("/task", async ([FromServices] ITaskManager manager, [FromBody]TaskDto task) =>

@@ -14,6 +14,7 @@ public interface ITaskController
     public Task<List<UserModel>> GetAllUserAsync();
     public Task<TaskModel> GetTaskToEdit(int taskId);
     public Task UpdateTask(TaskModel newTask);
+    public Task DeleteTask(TaskModel task);
 
 
 }

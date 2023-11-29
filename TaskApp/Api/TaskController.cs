@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Blazorise.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
@@ -59,6 +60,22 @@ public class TaskController : ITaskController
             return;
         }
     }
+
+    [Authorize]
+    public async Task DeleteTask(TaskModel task)
+    {
+        try
+        {
+            var result = await _httpClient.DeleteAsync($"/task-delete?taskId={task.Id}");
+            return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "could not delete task");
+            return;
+        }
+    }
+
 
     [Authorize]
     public async Task<List<TaskModel>> GetTasksByUserAsync()

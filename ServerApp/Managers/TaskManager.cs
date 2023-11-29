@@ -109,9 +109,18 @@ public class TaskManager : ITaskManager
         throw new NotImplementedException();
     }
 
-    public Task DeleteTask2RoleAsync(EntityTask task, CancellationToken cancellationToken = default)
+    public async Task DeleteTaskAndTask2Roles(int task, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var entityTask2Role = await _task2RoleStore.GetTask2RoleAsync(task, cancellationToken);
+
+        foreach (var role in entityTask2Role)
+        {
+            await _task2RoleStore.DeleteAsync(role);
+        }
+
+        var entityTask = await _taskStore.GetTaskAsync(task, cancellationToken);
+        await _taskStore.DeleteAsync(entityTask);
+        return;
     }
 
     Task ITaskManager.UpdateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken)

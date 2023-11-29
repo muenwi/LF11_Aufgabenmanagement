@@ -9,7 +9,7 @@ public interface ITaskManager
     public Task DeleteTaskAsync(EntityTask task, CancellationToken cancellationToken = default);
     public Task CreateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken = default);
     public Task UpdateTask2RoleAsync(int taskId, string roleId, CancellationToken cancellationToken = default);
-    public Task DeleteTask2RoleAsync(EntityTask task, CancellationToken cancellationToken = default);
+    public Task DeleteTaskAndTask2Roles(int taskId, CancellationToken cancellationToken = default);
     public Task<EntityTask> GetTaskAsync(int id, CancellationToken cancellationToken = default);
     public Task<IList<EntityTask>> GetTasksAsync(CancellationToken cancellationToken = default);
     public Task<IList<EntityTask>> GetTaskByUserAsync(string userId, CancellationToken cancellationToken = default);

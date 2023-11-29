@@ -123,9 +123,8 @@
 
     protected async Task OnContextItemDeleteClicked(TaskModel task)
     {
-        await dataGridRef.Delete(task);
-
         showContextMenu = false;
+        await _taskController.DeleteTask(task);
     }
 
     private Task ShowModal()
